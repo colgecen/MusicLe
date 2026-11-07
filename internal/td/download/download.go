@@ -246,7 +246,7 @@ func downloadVideo(ctx context.Context, v *youtube.Video, outputDir, playlist st
 			fmt.Fprintf(os.Stderr, "  bilgi: ses akisi verilmedi, video+ses birlikte indirilip sesi ayiklanacak (%s)\n", strings.ToUpper(container))
 		}
 		logging.Printf("youtube format attempt=%d itag=%d mime=%s container=%s dest=%q", attempts, f.ItagNo, f.MimeType, container, destPath)
-		err := youtube.DownloadAudio(ctx, v, f, partPath, scaleProgress(progress, 0, encodeProgressFrom))
+		err := youtube.DownloadAudio(ctx, v, f, partPath, scaleProgress(progress, 0, EncodeProgressStart))
 		if err == nil {
 			if rerr := os.Rename(partPath, destPath); rerr != nil {
 				_ = os.Remove(partPath)

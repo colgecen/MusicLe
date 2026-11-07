@@ -1,18 +1,19 @@
-// Package engine bundles a fully self-contained download engine (yt-dlp +
-// static ffmpeg) into the musicle-cli binary via go:embed.
+// Package engine is MusicLeCLI's self-contained download engine: a pure-Go
+// pipeline that turns YouTube or Spotify links into MP3 files with title,
+// artist and cover art embedded — no external binaries required.
 //
-// It contains the self-contained download pipeline. Build flow:
+// Pipeline:
 //
-//  1. scripts/prepare-engine.sh downloads yt-dlp and a static ffmpeg
-//     into internal/engine/engine_bin/ (no Python, no venv), then go:embed
-//     bakes them into the binary with -tags engine_assets.
+//  1. internal/td/youtube negotiates an InnerTube client and resolves the
+//     playable audio stream (or scores a search for free-text input).
+//  2. internal/td/download transfers it with resume support and re-encodes
+//     WebM/Opus or MP4/AAC to MP3 with internal/td/encode (pure Go).
+//  3. Title/artist/cover are written as ID3v2 (APIC) during encoding, so the
+//     file that lands in the library is already player-ready.
 //
-//  2. At startup, Extract() unpacks those binaries into
-//     UserCacheDir/musicle/engine-v2/ (a single-shot copy guarded by a
-//     sentinel file). Subsequent runs reuse the cache.
+// Spotify links are resolved through Spotify's public embed page (no API,
+// no token) into an "Artist - Title" query that the same pipeline downloads.
 //
-//  3. The wrappers in this package invoke the embedded yt-dlp to fetch audio
-//     and the embedded ffmpeg to mux it into a 320k MP3 with an embedded
-//     cover (APIC). Spotify URLs are resolved by yt-dlp itself, so no Spotify
-//     API or token is involved.
+// The Extract()/embed machinery in this package is legacy: it only backs the
+// optional yt-dlp/ffmpeg fallbacks used by the old bridge pipeline.
 package engine

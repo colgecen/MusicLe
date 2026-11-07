@@ -13,18 +13,15 @@ import (
 
 // DownloadSpotify downloads Spotify tracks without any API credentials. Each
 // track is resolved through Spotify's public embed page (no token) to its
-// artist + title, then downloaded from YouTube via the bundled yt-dlp using a
-// `ytsearch1:` query and muxed to 320k MP3 with an embedded cover — the same
-// pipeline as DownloadYouTube.
+// artist + title, then downloaded from YouTube with the pure-Go engine — the
+// engine scores the search results instead of blindly taking the first hit —
+// and muxed to MP3 with an embedded cover, the same pipeline as
+// DownloadYouTube.
 //
 // Playlist / album URLs are not resolved here (embed pages do not expose the
 // full track list without an API); they return an error so the bridge falls
 // back to its legacy API-free collection scraper.
 func DownloadSpotify(opt SpotifyOptions) error {
-	ext, err := Extract()
-	if err != nil {
-		return err
-	}
 	inputs := sanitizeSpotifyInputs(opt.URLs)
 	if len(inputs) == 0 {
 		return fmt.Errorf("spotify: at least one URL or search query is required")
@@ -34,7 +31,7 @@ func DownloadSpotify(opt SpotifyOptions) error {
 		if err != nil {
 			return err
 		}
-		if err := downloadOne(ext, "ytsearch1:"+query, opt.OutputDir, opt.Progress); err != nil {
+		if err := downloadWithTD([]string{query}, opt.OutputDir, false, opt.Progress); err != nil {
 			return err
 		}
 	}
@@ -42,9 +39,9 @@ func DownloadSpotify(opt SpotifyOptions) error {
 }
 
 // DownloadSpotifyPlaylist is kept as a separate entry point for playlist /
-// album flows. yt-dlp plays lists natively for YouTube, but Spotify
-// collections need the API-free collection scraper on the bridge side, so
-// this reports an error here only when a collection URL slips through.
+// album flows. Spotify collections need the API-free collection scraper on
+// the bridge side, so this reports an error here only when a collection URL
+// slips through.
 func DownloadSpotifyPlaylist(opt SpotifyOptions) error {
 	return DownloadSpotify(opt)
 }

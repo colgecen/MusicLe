@@ -8,25 +8,17 @@ import (
 	"testing"
 )
 
-// TestIntegrationDownloadReal exercises the full embedded pipeline against a
-// real YouTube video ("Me at the zoo", 19s): Extract() -> yt-dlp metadata +
-// bestaudio + thumbnail -> ffmpeg mux to 320k mp3 with an APIC cover. It
-// requires the engine to be embedded (built with -tags engine_assets) and
-// network access, so it is skipped unless MUSICLE_INTEGRATION=1.
+// TestIntegrationDownloadReal exercises the full pure-Go pipeline against a
+// real YouTube video ("Me at the zoo", 19s): InnerTube metadata -> best
+// MP3-convertible stream -> pure-Go decode/encode to mp3 with an APIC cover.
+// It needs network access, so it is skipped unless MUSICLE_INTEGRATION=1.
 func TestIntegrationDownloadReal(t *testing.T) {
 	if os.Getenv("MUSICLE_INTEGRATION") == "" {
 		t.Skip("MUSICLE_INTEGRATION=1 set to run network download test")
 	}
-	ext, err := Extract()
-	if err != nil {
-		t.Skipf("engine assets not embedded in this build: %v", err)
-	}
-	if ext == nil || ext.YTDLP == "" || ext.FFMPEG == "" {
-		t.Fatal("Extract returned incomplete locations")
-	}
 
 	out := t.TempDir()
-	err = DownloadYouTube(YouTubeOptions{
+	err := DownloadYouTube(YouTubeOptions{
 		OutputDir: out,
 		URLs:      []string{"https://www.youtube.com/watch?v=jNQXAC9IVRw"},
 		Progress:  func(pct int, msg string) { t.Logf("%3d%% %s", pct, msg) },
@@ -84,16 +76,9 @@ func TestIntegrationSpotifyTrackDownload(t *testing.T) {
 	if os.Getenv("MUSICLE_INTEGRATION") == "" {
 		t.Skip("MUSICLE_INTEGRATION=1 set to run network download test")
 	}
-	ext, err := Extract()
-	if err != nil {
-		t.Skipf("engine assets not embedded in this build: %v", err)
-	}
-	if ext == nil || ext.YTDLP == "" || ext.FFMPEG == "" {
-		t.Fatal("Extract returned incomplete locations")
-	}
 
 	out := t.TempDir()
-	err = DownloadSpotify(SpotifyOptions{
+	err := DownloadSpotify(SpotifyOptions{
 		OutputDir: out,
 		URLs:      []string{"https://open.spotify.com/track/4uLU6hMCjMI75M1A2tKUQC"},
 		Progress:  func(pct int, msg string) { t.Logf("%3d%% %s", pct, msg) },

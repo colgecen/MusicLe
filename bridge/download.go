@@ -13,7 +13,7 @@ import (
 	"MusicLeCLI/state"
 )
 
-// engineDisabled reports whether the user opted out of the embedded engine
+// engineDisabled reports whether the user opted out of the pure-Go engine
 // for this run (via env var). Useful for debugging the legacy pipeline.
 func engineDisabled() bool {
 	v := strings.ToLower(strings.TrimSpace(os.Getenv("MUSICLE_NO_ENGINE")))
@@ -28,9 +28,8 @@ func isSpotifyURL(url string) bool {
 	return strings.Contains(u, "spotify.com") || strings.HasPrefix(u, "spotify:")
 }
 
-// downloadYouTube downloads a YouTube URL using the embedded engine when
-// available, falling back to the legacy pure-Go pipeline if the embedded
-// engine is unavailable (assets missing or extraction failed).
+// downloadYouTube downloads a YouTube URL using the pure-Go engine, falling
+// back to the legacy pipeline if the engine errors out or produces nothing.
 func downloadYouTube(url, outputDir string) *Result {
 	if url == "" {
 		return &Result{Status: "error", Error: "invalid URL"}
@@ -66,18 +65,14 @@ func downloadYouTube(url, outputDir string) *Result {
 	return meta
 }
 
-// runEngine is the unified yt-dlp dispatcher and the head of the
-// error fallback chain. It tries the embedded engine first, routing by URL
+// runEngine is the unified Go-engine dispatcher and the head of the
+// error fallback chain. It tries the pure-Go engine first, routing by URL
 // type, and verifies a real audio file was produced before declaring
-// success. When the engine is unavailable, returns an error, or writes
+// success. When the engine is disabled by env, returns an error, or writes
 // nothing, it returns (nil, false) so the caller falls back to the legacy
 // pipeline.
 func runEngine(url, outputDir string) (*Result, bool) {
 	if engineDisabled() {
-		return nil, false
-	}
-	if _, err := engine.Extract(); err != nil {
-		CurrentDownload.Set(true, 0, "Bridge: no engine, using legacy method")
 		return nil, false
 	}
 
@@ -85,7 +80,7 @@ func runEngine(url, outputDir string) (*Result, bool) {
 	prior := listAudioFiles(outputDir)
 
 	if isSpotifyURL(url) {
-		CurrentDownload.Set(true, 0, "Bridge: starting Spotify engine (yt-dlp)...")
+		CurrentDownload.Set(true, 0, "Bridge: starting Spotify engine...")
 		err := engine.DownloadSpotify(engine.SpotifyOptions{
 			OutputDir: outputDir,
 			URLs:      []string{url},
@@ -96,7 +91,7 @@ func runEngine(url, outputDir string) (*Result, bool) {
 			return nil, false
 		}
 	} else {
-		CurrentDownload.Set(true, 0, "Bridge: starting yt-dlp engine...")
+		CurrentDownload.Set(true, 0, "Bridge: starting Go engine...")
 		err := engine.DownloadYouTube(engine.YouTubeOptions{
 			OutputDir: outputDir,
 			URLs:      []string{url},
@@ -273,7 +268,7 @@ func downloadSpotify(url, outputDir string) *Result {
 
 	if isPlaylist || isAlbum {
 		// Collections are handled by the legacy pipeline by design (the
-		// embedded engine resolves single tracks only). Skip the engine
+		// engine resolves single tracks only). Skip the engine
 		// attempt so a normal playlist path never flashes "Engine error".
 		return downloadSpotifyPlaylist(url, outputDir)
 	}
@@ -390,7 +385,7 @@ func downloadSpotify(url, outputDir string) *Result {
 	}
 
 // downloadSpotifyPlaylist goes straight to the legacy API-free collection
-// scraper. The embedded engine resolves single tracks only, so attempting it
+// scraper. The engine resolves single tracks only, so attempting it
 // here would only produce a bogus "Engine error" for a normal path.
 func downloadSpotifyPlaylist(spotifyURL, outputDir string) *Result {
 	files, err := playlist.DownloadSpotifyPlaylist(spotifyURL, outputDir, func(pct int, msg string) {

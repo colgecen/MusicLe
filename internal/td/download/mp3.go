@@ -47,8 +47,8 @@ func maybeConvertToMP3(ctx context.Context, ti *model.TrackInfo, filePath string
 	}
 
 	// Encoding is the second half of the overall progress bar, which the
-	// download phase filled up to encodeProgressFrom.
-	if err := encode.ToMP3(ctx, filePath, dst, float64(ti.DurationSec), tags, scaleProgress(progress, encodeProgressFrom, 100)); err != nil {
+	// download phase filled up to EncodeProgressStart.
+	if err := encode.ToMP3(ctx, filePath, dst, float64(ti.DurationSec), tags, scaleProgress(progress, EncodeProgressStart, 100)); err != nil {
 		return filePath, fmt.Errorf("mp3 donusumu: %w", err)
 	}
 	ti.Format = "mp3"
@@ -63,9 +63,10 @@ func maybeConvertToMP3(ctx context.Context, ti *model.TrackInfo, filePath string
 	return dst, nil
 }
 
-// encodeProgressFrom is where download progress stops and MP3 encoding starts,
-// so the bar moves once instead of resetting between the two phases.
-const encodeProgressFrom = 70.0
+// EncodeProgressStart is where download progress stops and MP3 encoding
+// starts, so the bar moves once instead of resetting between the two phases.
+// Hosts (like the MusicLeCLI engine) use it to label the current phase.
+const EncodeProgressStart = 70.0
 
 // scaleProgress maps a 0-100 callback onto the [lo, hi] slice of a single
 // progress bar. A nil callback stays nil.
