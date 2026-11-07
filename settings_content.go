@@ -653,8 +653,7 @@ Temel özellikler
 - Spektrum/görselleştirme ve kayan şarkı sözü gibi oynatıcı özellikleri.
 
 Kullanılan 3. taraf araçlar
-- yt-dlp: ses akışı çekmek için açık kaynaklı indirme motoru.
-- ffmpeg: MP3'e dönüştürme ve kapak/resim işleme için.
+- TerminalDownloader: saf Go indirme ve MP3 kodlama motoru.
 - Spotify: meta veri ve arama için veri kaynağı.`
 	case state.LangSpanish:
 		return `Acerca de Musicle
@@ -687,8 +686,7 @@ Características
 - Espectro y letras sincronizadas.
 
 Terceros
-- yt-dlp: motor de descarga open source.
-- ffmpeg: conversión MP3 e imágenes.
+- TerminalDownloader: motor de descarga y codificación MP3 en Go puro.
 - Spotify: metadatos y búsqueda.`
 	case state.LangGerman:
 		return `Über Musicle
@@ -721,8 +719,7 @@ Funktionen
 - Spektrum und scrollende Lyrics.
 
 Drittanbieter
-- yt-dlp: Open-Source-Download-Engine.
-- ffmpeg: MP3-Konvertierung und Bilder.
+- TerminalDownloader: Pure-Go-Download- und MP3-Enkodierung.
 - Spotify: Metadaten und Suche.`
 	case state.LangFrench:
 		return `À propos de Musicle
@@ -755,8 +752,7 @@ Fonctionnalités
 - Spectre et paroles défilantes.
 
 Tiers
-- yt-dlp : moteur de téléchargement open source.
-- ffmpeg : conversion MP3 et images.
+- TerminalDownloader : moteur de téléchargement et d’encodage MP3 en Go pur.
 - Spotify : métadonnées et recherche.`
 	case state.LangArabic:
 		return `حول Musicle
@@ -787,8 +783,7 @@ GitHub: @colgecen
 - الطيف وكلمات متحركة.
 
 أدوات خارجية
-- yt-dlp: محرك تنزيل مفتوح المصدر.
-- ffmpeg: تحويل MP3 ومعالجة الصور.
+- TerminalDownloader: محرك تنزيل وترميز MP3 بلغة Go الخالصة.
 - Spotify: بيانات وصفية وبحث.`
 	case state.LangPortuguese:
 		return `Sobre o Musicle
@@ -821,8 +816,7 @@ Funcionalidades
 - Espectro e letras rolantes.
 
 Terceiros
-- yt-dlp: motor de download open source.
-- ffmpeg: conversão MP3 e imagens.
+- TerminalDownloader: motor de download e codificação MP3 em Go puro.
 - Spotify: metadados e pesquisa.`
 	case state.LangChinese:
 		return `关于 Musicle
@@ -853,8 +847,7 @@ GitHub：@colgecen
 - 频谱可视化与滚动歌词。
 
 第三方
-- yt-dlp：开源下载引擎。
-- ffmpeg：MP3 转换与图片处理。
+- TerminalDownloader：纯 Go 下载与 MP3 编码引擎。
 - Spotify：元数据与搜索数据源。`
 	case state.LangJapanese:
 		return `Musicle について
@@ -885,8 +878,7 @@ SpotifyやYouTubeから個人の音楽ライブラリをダウンロードしロ
 - スペクトラムとスクロール歌詞。
 
 サードパーティ
-- yt-dlp: オープンソースDLエンジン。
-- ffmpeg: MP3変換と画像処理。
+- TerminalDownloader: ピュアGoのダウンロード・MP3エンコードエンジン。
 - Spotify: メタデータと検索ソース。`
 	case state.LangItalian:
 		return `Info su Musicle
@@ -919,8 +911,7 @@ Funzionalità
 - Spettro e testi scorrevoli.
 
 Terze parti
-- yt-dlp: motore di download open source.
-- ffmpeg: conversione MP3 e immagini.
+- TerminalDownloader: motore di download e codifica MP3 in Go puro.
 - Spotify: metadati e ricerca.`
 	case state.LangRussian:
 		return `О Musicle
@@ -953,8 +944,7 @@ GitHub: @colgecen
 - Спектр и бегущая строка текста песни.
 
 Сторонние
-- yt-dlp: open-source движок загрузки.
-- ffmpeg: конвертация MP3 и изображения.
+- TerminalDownloader: движок загрузки и кодирования MP3 на чистом Go.
 - Spotify: метаданные и поиск.`
 	default:
 		return `About Musicle
@@ -987,8 +977,7 @@ Key features
 - Spectrum and scrolling lyrics.
 
 3rd party
-- yt-dlp: open-source download engine.
-- ffmpeg: MP3 conversion and images.
+- TerminalDownloader: pure-Go download and MP3 encoding engine.
 - Spotify: metadata and search source.`
 	}
 }

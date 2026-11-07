@@ -517,7 +517,7 @@ func (m *DownloadsModel) RefreshTheme() {
 
 // detectDownloadProvider inspects a URL's shape and returns the download
 // action the bridge should run. Spotify links/URIs route to the Spotify
-// pipeline; recognised YouTube links route to the YouTube pipeline (yt-dlp).
+// pipeline; recognised YouTube links route to the YouTube pipeline (pure-Go engine).
 // Unrecognised URLs default to Spotify to preserve prior behaviour.
 func detectDownloadProvider(rawURL string) string {
 	u := strings.ToLower(strings.TrimSpace(rawURL))

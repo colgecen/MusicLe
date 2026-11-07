@@ -13,7 +13,4 @@
 //
 // Spotify links are resolved through Spotify's public embed page (no API,
 // no token) into an "Artist - Title" query that the same pipeline downloads.
-//
-// The Extract()/embed machinery in this package is legacy: it only backs the
-// optional yt-dlp/ffmpeg fallbacks used by the old bridge pipeline.
 package engine

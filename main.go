@@ -17,7 +17,7 @@ var commit = ""
 var date = ""
 
 const bannerText = `MusicLeCLI — terminal music player
-Embedded download engine: yt-dlp + FFmpeg (MP3 320k + album art)
+Pure-Go download engine: no external tools (MP3 + album art)
 `
 
 const helpText = `MusicLeCLI — terminal music player with download engine
