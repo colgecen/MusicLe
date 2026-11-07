@@ -97,8 +97,7 @@ jobs:
             curl -sL https://go.dev/dl/go1.26.1.linux-arm64.tar.gz -o /tmp/go.tgz
             tar -C /usr/local -xzf /tmp/go.tgz
             export PATH=/usr/local/go/bin:\$PATH
-            ./scripts/prepare-engine.sh linux
-            go build -tags engine_assets -ldflags='-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=\$(date -u +%Y-%m-%d)' \
+            go build -ldflags='-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=\$(date -u +%Y-%m-%d)' \
               -o musicle-cli-linux-arm64 .
           "
       - name: Package archive
@@ -131,13 +130,11 @@ jobs:
         with:
           go-version: stable
           check-latest: true
-      - name: Prepare engine (windows)
-        run: ./scripts/prepare-engine.sh windows
       - name: Build
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          go build -tags engine_assets \
+          go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
             -o musicle-cli-windows-${{ matrix.arch }}.exe .
       - name: Package archive
@@ -174,13 +171,11 @@ jobs:
         run: |
           wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
           chmod +x appimagetool
-      - name: Prepare engine (linux)
-        run: ./scripts/prepare-engine.sh linux
       - name: Build binary
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          CGO_ENABLED=1 go build -tags engine_assets \
+          CGO_ENABLED=1 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
             -o musicle-cli-linux-x86_64.AppDir/usr/bin/musicle-cli .
       - name: Prepare AppDir
@@ -232,13 +227,11 @@ jobs:
         with:
           go-version: stable
           check-latest: true
-      - name: Prepare engine (darwin)
-        run: ./scripts/prepare-engine.sh darwin
       - name: Build macOS (amd64)
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -tags engine_assets \
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
             -o musicle-cli-darwin-amd64 .
       - name: Package archive
@@ -307,13 +300,11 @@ jobs:
         with:
           go-version: stable
           check-latest: true
-      - name: Prepare engine (darwin)
-        run: ./scripts/prepare-engine.sh darwin
       - name: Build macOS (arm64)
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -tags engine_assets \
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
             -o musicle-cli-darwin-arm64 .
       - name: Package archive

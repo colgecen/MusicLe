@@ -9,27 +9,23 @@ VERSION ?= 1.5.0
 
 LDFLAGS := -ldflags="-s -w -X main.version=$(VERSION)"
 
-.PHONY: all engine build vet test check clean
+.PHONY: all build vet test check clean
 
 all: build
 
-# Build the embedded download engine (standalone yt-dlp + static ffmpeg/ffprobe).
-engine:
-	./scripts/prepare-engine.sh linux
-
 # Full binary build (requires CGO + ALSA dev headers for the audio player).
-# Depends on `engine` so the bundled yt-dlp+ffmpeg are prepared, then baked in
-# with -tags engine_assets. The result is fully self-contained for end users.
-# The binary is stripped (-s -w) and UPX-packed to keep the embedded tools small.
-build: engine
-	CGO_ENABLED=1 $(GO) build -tags engine_assets $(LDFLAGS) -o build/musicle-cli .
+# The download engine is pure Go (internal/engine + internal/td), so there is
+# nothing to prepare: one plain `go build` yields a fully self-contained
+# binary. The binary is stripped (-s -w) and UPX-packed when upx is present.
+build:
+	CGO_ENABLED=1 $(GO) build $(LDFLAGS) -o build/musicle-cli .
 	-upx --best --lzma build/musicle-cli 2>/dev/null || true
 
 # Vet the packages that do not depend on the audio player (buildable anywhere).
 vet:
 	$(GO) vet ./internal/... ./bridge/download/...
 
-# Unit tests (engine package + download helpers).
+# Unit tests (engine, terminal-downloader and download helper packages).
 test:
 	$(GO) test ./internal/... ./bridge/download/...
 
@@ -37,4 +33,4 @@ test:
 check: vet test
 
 clean:
-	rm -rf build internal/engine/engine_bin
+	rm -rf build

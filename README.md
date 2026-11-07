@@ -8,7 +8,7 @@
 
 ## Features
 
-- Download tracks and playlists from Spotify and YouTube links (bundled yt-dlp + FFmpeg, 320 kbps MP3 + cover art)
+- Download tracks and playlists from Spotify and YouTube links (pure-Go engine, no external tools, MP3 + cover art)
 - Song list, profile and playlist management; entries are stored in `song_list.txt`
 - The playing track's cover art is shown automatically on the main screen
 - Spectrum visualizer, scrolling lyrics and volume bars

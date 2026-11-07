@@ -11,24 +11,9 @@ fi
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 
-# prepare_engine downloads the self-contained engine (standalone yt-dlp +
-# static ffmpeg/ffprobe) for the given target OS into internal/engine/engine_bin
-# so `go:embed` can bake it into the binary. Requires network access (curl).
-prepare_engine() {
-  local os="$1"
-  echo "==> Gömülü motor hazırlanıyor ($os)..."
-  if "$ROOT/scripts/prepare-engine.sh" "$os"; then
-    echo "==> Motor hazır."
-  else
-    echo "WARNING: motor hazırlanamadı; build -tags engine_assets başarısız olabilir."
-  fi
-}
-
-# Gömülü motor varlıkları (internal/engine/engine_bin: yt-dlp + ffmpeg/ffprobe)
-# repoya işlenmez; .gitignore'da tutulur. `prepare_engine` adımı onları indirip
-# internal/engine/engine_bin altına koyar, ardından `go build -tags
-# engine_assets` go:embed ile binary'ye gömer. Etiketsiz derlemede gömülü motor
-# yoktur ve bridge çalışma anında legacy yönteme düşer.
+# Indirme motoru saf Go (internal/engine + internal/td): hazirlik adimi,
+# gomulu yt-dlp/ffmpeg, ek tag yok. Tek duz `go build` kendi kendine yeterli
+# binary uretir.
 
 echo "Select target OS:"
 echo "1) Linux"
@@ -47,8 +32,7 @@ case "$os_choice" in
 
     mkdir -p build
     echo "==> Building binary..."
-    prepare_engine linux
-    CGO_ENABLED=1 $GO build -tags engine_assets -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli .
+    CGO_ENABLED=1 $GO build -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli .
     -upx --best --lzma build/musicle-cli 2>/dev/null || true
 
     case "$fmt" in
@@ -68,26 +52,6 @@ case "$os_choice" in
                     ;;
             esac
         done
-
-        echo "==> Downloading yt-dlp..."
-        YTDLP_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_linux"
-        if command -v curl &>/dev/null; then
-            curl -sL "$YTDLP_URL" -o $APPDIR/usr/bin/yt-dlp
-        elif command -v wget &>/dev/null; then
-            wget -q "$YTDLP_URL" -O $APPDIR/usr/bin/yt-dlp
-        fi
-        if [ -f $APPDIR/usr/bin/yt-dlp ]; then
-            chmod +x $APPDIR/usr/bin/yt-dlp
-            # Verify it works
-            if $APPDIR/usr/bin/yt-dlp --version >/dev/null 2>&1; then
-                echo "  yt-dlp bundled: $($APPDIR/usr/bin/yt-dlp --version)"
-            else
-                echo "  WARNING: yt-dlp download appears broken, removing"
-                rm -f $APPDIR/usr/bin/yt-dlp
-            fi
-        else
-            echo "  WARNING: yt-dlp download failed, will try system yt-dlp at runtime"
-        fi
 
         cp build/musicle-cli $APPDIR/usr/bin/
         cp assets/MusicLe.png $APPDIR/.DirIcon
@@ -180,8 +144,7 @@ SPEC
     read -p "Choice [1-2]: " fmt
     mkdir -p build
     echo "==> Building..."
-    prepare_engine windows
-    GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $GO build -tags engine_assets -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli.exe .
+    GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $GO build -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli.exe .
     -upx --best --lzma build/musicle-cli.exe 2>/dev/null || true
     if [ "$fmt" = "2" ]; then
       mkdir -p build/musicle-cli_Windows_x86_64
@@ -199,8 +162,7 @@ SPEC
     read -p "Choice [1-2]: " fmt
     mkdir -p build
     echo "==> Building..."
-    prepare_engine darwin
-    GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 $GO build -tags engine_assets -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli-darwin .
+    GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 $GO build -ldflags="-s -w -X main.version=$VERSION" -o build/musicle-cli-darwin .
     -upx --best --lzma build/musicle-cli-darwin 2>/dev/null || true
     if [ "$fmt" = "1" ]; then
       mkdir -p build/musicle-cli_macOS_x86_64

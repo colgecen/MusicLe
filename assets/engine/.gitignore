@@ -1,7 +1,0 @@
-# Embedded engine binaries are downloaded by scripts/prepare-engine.sh into
-# internal/engine/engine_bin/ (ignored in the root .gitignore) and baked in via
-# -tags engine_assets. This directory only holds non-binary metadata
-# (manifest.yaml). Ignore any stray binary artifacts dropped here by hand.
-*.exe
-*.tar.xz
-*.zip

@@ -54,38 +54,9 @@ profiles/
 state/config.json
 state/*.json
 
-# Python engine files
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# Build artifacts
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual environments
-venv/
-
-# Embedded engine assets (downloaded by scripts/prepare-engine.sh, then baked
-# into the binary with -tags engine_assets). They are NOT committed — a fresh
-# clone must run `make build` / `prepare-engine.sh` first, so the engine bin
-# dir stays out of git.
-internal/engine/engine_bin/
-# Obsolete engine working dirs (old Python venv / static ffmpeg layout). Kept
-# ignored so any stale prepare output can never be committed.
-assets/engine/venv/
-assets/engine/ffmpeg/
 
 # AppImage build artifacts
 *.AppImage
