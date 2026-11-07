@@ -11,20 +11,20 @@ import (
 // ytInitialPlayerResponse JSON structures
 
 type playerResponse struct {
-	VideoDetails   *videoDetails   `json:"videoDetails"`
-	StreamingData  *streamingData  `json:"streamingData"`
+	VideoDetails      *videoDetails      `json:"videoDetails"`
+	StreamingData     *streamingData     `json:"streamingData"`
 	PlayabilityStatus *playabilityStatus `json:"playabilityStatus"`
 }
 
 type videoDetails struct {
-	Title          string     `json:"title"`
-	LengthSeconds  string     `json:"lengthSeconds"`
-	Author         string     `json:"author"`
-	ChannelID      string     `json:"channelId"`
-	ShortDescription string   `json:"shortDescription"`
-	Thumbnail      *thumbnails `json:"thumbnail"`
-	IsPrivate      bool       `json:"isPrivate"`
-	IsLiveContent  bool       `json:"isLiveContent"`
+	Title            string      `json:"title"`
+	LengthSeconds    string      `json:"lengthSeconds"`
+	Author           string      `json:"author"`
+	ChannelID        string      `json:"channelId"`
+	ShortDescription string      `json:"shortDescription"`
+	Thumbnail        *thumbnails `json:"thumbnail"`
+	IsPrivate        bool        `json:"isPrivate"`
+	IsLiveContent    bool        `json:"isLiveContent"`
 }
 
 type thumbnails struct {
@@ -38,26 +38,26 @@ type thumbnail struct {
 }
 
 type streamingData struct {
-	ExpiresInSeconds string          `json:"expiresInSeconds"`
-	Formats          []streamFormat  `json:"formats"`
-	AdaptiveFormats  []streamFormat  `json:"adaptiveFormats"`
+	ExpiresInSeconds string         `json:"expiresInSeconds"`
+	Formats          []streamFormat `json:"formats"`
+	AdaptiveFormats  []streamFormat `json:"adaptiveFormats"`
 }
 
 type streamFormat struct {
-	ITag             int    `json:"itag"`
-	MimeType         string `json:"mimeType"`
-	Bitrate          int    `json:"bitrate"`
-	ContentLength    string `json:"contentLength"`
-	URL              string `json:"url"`
-	SignatureCipher  string `json:"signatureCipher"`
-	Cipher           string `json:"cipher"`
-	AudioQuality     string `json:"audioQuality"`
-	AudioSampleRate  string `json:"audioSampleRate"`
-	AudioChannels    int    `json:"audioChannels"`
-	FPS              int    `json:"fps"`
-	Width            int    `json:"width"`
-	Height           int    `json:"height"`
-	QualityLabel     string `json:"qualityLabel"`
+	ITag            int    `json:"itag"`
+	MimeType        string `json:"mimeType"`
+	Bitrate         int    `json:"bitrate"`
+	ContentLength   string `json:"contentLength"`
+	URL             string `json:"url"`
+	SignatureCipher string `json:"signatureCipher"`
+	Cipher          string `json:"cipher"`
+	AudioQuality    string `json:"audioQuality"`
+	AudioSampleRate string `json:"audioSampleRate"`
+	AudioChannels   int    `json:"audioChannels"`
+	FPS             int    `json:"fps"`
+	Width           int    `json:"width"`
+	Height          int    `json:"height"`
+	QualityLabel    string `json:"qualityLabel"`
 }
 
 type playabilityStatus struct {

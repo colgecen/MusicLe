@@ -21,8 +21,8 @@ func engineDisabled() bool {
 }
 
 // isSpotifyURL heuristically detects Spotify links/URIs so the unified
-// engine dispatcher can route them through yt-dlp (which resolves Spotify
-// pages directly), kept separate from plain YouTube URLs.
+// engine dispatcher can resolve them through the Spotify embed page first,
+// kept separate from plain YouTube URLs.
 func isSpotifyURL(url string) bool {
 	u := strings.ToLower(strings.TrimSpace(url))
 	return strings.Contains(u, "spotify.com") || strings.HasPrefix(u, "spotify:")
@@ -300,48 +300,6 @@ func downloadSpotify(url, outputDir string) *Result {
 
 	CurrentDownload.Set(true, 10, "Downloading from YouTube...")
 
-	// Try direct MP3 download via yt-dlp + ffmpeg first (most reliable)
-	ytTrack, mp3Data, err := music.DownloadYouTubeTrackDirectMP3(videoID, func(pct int, msg string) {
-		CurrentDownload.Set(true, 10+float64(pct)*80/100, msg)
-	})
-	if err == nil && mp3Data != nil {
-		CurrentDownload.Set(true, 90, "Writing ID3 tag...")
-
-		spTrack.StreamURL = "https://www.youtube.com/watch?v=" + videoID
-		spTrack.Format = "mp3"
-		spTrack.ContentLen = int64(len(mp3Data))
-		// Carry artwork so the cover gets embedded (search enrichment is
-		// sometimes title-only, hence the hqdefault fallback).
-		if spTrack.Thumbnail == "" {
-			ytThumb := ""
-			if ytTrack != nil {
-				ytThumb = ytTrack.Thumbnail
-			}
-			spTrack.Thumbnail = music.VideoThumbnail(videoID, ytThumb)
-		}
-
-		tagged, err := music.SaveRawAsMP3(mp3Data, spTrack, outputDir, func(pct int, msg string) {
-			CurrentDownload.Set(true, 90+float64(pct)*10/100, msg)
-		})
-		if err != nil {
-			CurrentDownload.Set(false, 0, "Error")
-			return &Result{Status: "error", Error: fmt.Sprintf("tag: %v", err)}
-		}
-
-		CurrentDownload.Set(false, 100, "Done")
-		res := &Result{
-			Status:   "ok",
-			Filename: filepath.Base(tagged),
-			Title:    spTrack.Title,
-			Artist:   spTrack.Artist,
-			Duration: spTrack.DurationSec,
-		}
-		registerSong(outputDir, tagged, res)
-		return res
-	}
-
-	// Fallback: download raw WebM and convert
-	CurrentDownload.Set(true, 10, "Direct MP3 failed, trying raw download...")
 	ytTrack, rawAudio, err := music.DownloadYouTubeTrack(videoID, func(pct int, msg string) {
 		CurrentDownload.Set(true, 10+float64(pct)*30/100, msg)
 	})
@@ -371,18 +329,18 @@ func downloadSpotify(url, outputDir string) *Result {
 		return &Result{Status: "error", Error: fmt.Sprintf("convert: %v", err)}
 	}
 
-		CurrentDownload.Set(false, 100, "Done")
+	CurrentDownload.Set(false, 100, "Done")
 
-		res := &Result{
-			Status:   "ok",
-			Filename: filepath.Base(filePath),
-			Title:    spTrack.Title,
-			Artist:   spTrack.Artist,
-			Duration: spTrack.DurationSec,
-		}
-		registerSong(outputDir, filePath, res)
-		return res
+	res := &Result{
+		Status:   "ok",
+		Filename: filepath.Base(filePath),
+		Title:    spTrack.Title,
+		Artist:   spTrack.Artist,
+		Duration: spTrack.DurationSec,
 	}
+	registerSong(outputDir, filePath, res)
+	return res
+}
 
 // downloadSpotifyPlaylist goes straight to the legacy API-free collection
 // scraper. The engine resolves single tracks only, so attempting it

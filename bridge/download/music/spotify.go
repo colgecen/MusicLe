@@ -1,15 +1,12 @@
 package music
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -486,80 +483,9 @@ type ldMusicAlbum struct {
 }
 
 // FetchSpotifyPlaylistMetadata returns a Spotify playlist/album's name and
-// track list. It prefers yt-dlp (far more robust than HTML scraping) and
-// falls back to scraping Spotify's web page if yt-dlp is unavailable or fails.
+// track list by scraping Spotify's public web page (no API, no token).
 func FetchSpotifyPlaylistMetadata(collectionURL string) (name string, tracks []download.TrackInfo, err error) {
-	if n, t, e := fetchSpotifyMetadataYTDLP(collectionURL); e == nil && len(t) > 0 {
-		return n, t, nil
-	}
 	return fetchSpotifyMetadataScraper(collectionURL)
-}
-
-// fetchSpotifyMetadataYTDLP extracts playlist metadata via yt-dlp, which works
-// reliably when the yt-dlp-spot plugin (or equivalent) is installed.
-func fetchSpotifyMetadataYTDLP(collectionURL string) (string, []download.TrackInfo, error) {
-	var name string
-	ytdlp := findYTDLP()
-	if ytdlp == "" {
-		return "", nil, fmt.Errorf("yt-dlp not found")
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, ytdlp, "--flat-playlist", "--no-warnings",
-		"--ignore-errors", "-J", collectionURL)
-	cmd.Env = append(cmd.Environ(), "PYTHONIOENCODING=utf-8")
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	if err := cmd.Run(); err != nil {
-		return "", nil, fmt.Errorf("yt-dlp: %w (%s)", err, strings.TrimSpace(stderr.String()))
-	}
-
-	var root struct {
-		Title    string `json:"title"`
-		Playlist string `json:"playlist"`
-		Entries  []struct {
-			Title    string  `json:"title"`
-			Track    string  `json:"track"`
-			Artist   string  `json:"artist"`
-			Album    string  `json:"album"`
-			Duration float64 `json:"duration"`
-		} `json:"entries"`
-	}
-	if err := json.Unmarshal(stdout.Bytes(), &root); err != nil {
-		return "", nil, fmt.Errorf("parse yt-dlp json: %w", err)
-	}
-	if len(root.Entries) == 0 {
-		return "", nil, fmt.Errorf("yt-dlp returned no entries")
-	}
-
-	name = root.Title
-	if name == "" {
-		name = root.Playlist
-	}
-	tracks := make([]download.TrackInfo, 0, len(root.Entries))
-	for _, e := range root.Entries {
-		title := strings.TrimSpace(e.Track)
-		if title == "" {
-			title = strings.TrimSpace(e.Title)
-		}
-		artist := strings.TrimSpace(e.Artist)
-		if title == "" {
-			continue
-		}
-		tracks = append(tracks, download.TrackInfo{
-			Title:       htmlUnescape(title),
-			Artist:      htmlUnescape(artist),
-			Album:       htmlUnescape(e.Album),
-			DurationSec: e.Duration,
-			Playlist:    htmlUnescape(name),
-		})
-	}
-	if len(tracks) == 0 {
-		return "", nil, fmt.Errorf("yt-dlp returned no usable tracks")
-	}
-	return name, tracks, nil
 }
 
 // fetchSpotifyMetadataScraper scrapes a Spotify playlist or album page for name and track list.

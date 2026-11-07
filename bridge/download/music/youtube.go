@@ -2,14 +2,12 @@ package music
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -18,16 +16,12 @@ import (
 	"time"
 
 	"MusicLeCLI/bridge/download"
-	"MusicLeCLI/internal/engine"
 )
 
 var (
 	youtubeRL *rateLimiter
 	spotifyRL *rateLimiter
 	rlOnce    sync.Once
-
-	ytdlpPath string
-	ytdlpOnce sync.Once
 )
 
 // httpClient bounds every pure-Go download request. http.DefaultClient has no
@@ -326,83 +320,12 @@ func classifyYouTubeError(err error) error {
 	}
 }
 
-func findYTDLP() string {
-	ytdlpOnce.Do(func() {
-		// Prefer the bundled engine (self-contained build).
-		if ext, err := engine.Extract(); err == nil && ext.YTDLP != "" {
-			ytdlpPath = ext.YTDLP
-			return
-		}
-		// Common locations
-		paths := []string{
-			"yt-dlp", // in PATH
-			filepath.Join(os.Getenv("APPDIR"), "usr", "bin", "yt-dlp"),
-			filepath.Join(filepath.Dir(os.Args[0]), "yt-dlp"),
-			"/usr/local/bin/yt-dlp",
-			"/usr/bin/yt-dlp",
-		}
-		for _, p := range paths {
-			if p == "" {
-				continue
-			}
-			if _, err := os.Stat(p); err == nil {
-				ytdlpPath = p
-				return
-			}
-		}
-		// Also check cwd for development
-		if _, err := os.Stat("./yt-dlp"); err == nil {
-			ytdlpPath = "./yt-dlp"
-		}
-	})
-	return ytdlpPath
-}
-
-var ffmpegPath string
-var ffmpegOnce sync.Once
-
-func findFFmpeg() string {
-	ffmpegOnce.Do(func() {
-		// Prefer the bundled engine (self-contained build).
-		if ext, err := engine.Extract(); err == nil && ext.FFMPEG != "" {
-			ffmpegPath = ext.FFMPEG
-			return
-		}
-		paths := []string{
-			"ffmpeg",
-			filepath.Join(os.Getenv("APPDIR"), "usr", "bin", "ffmpeg"),
-			filepath.Join(filepath.Dir(os.Args[0]), "ffmpeg"),
-			"/usr/local/bin/ffmpeg",
-			"/usr/bin/ffmpeg",
-		}
-		for _, p := range paths {
-			if p == "" {
-				continue
-			}
-			if _, err := os.Stat(p); err == nil {
-				ffmpegPath = p
-				return
-			}
-		}
-		// Also check cwd for development
-		if _, err := os.Stat("./ffmpeg"); err == nil {
-			ffmpegPath = "./ffmpeg"
-		}
-	})
-	return ffmpegPath
-}
-
-// DownloadYouTubeTrackWithFallback tries yt-dlp first, then falls back to
-// pure-Go parsing. YouTube now gates streams behind challenges the pure-Go
-// parser usually fails late (after tens of seconds), so yt-dlp-first is both
-// faster and far more reliable.
+// DownloadYouTubeTrack resolves a video's audio through the pure-Go page
+// parser. It is the legacy fallback path: the primary download pipeline is
+// the engine (internal/engine), which uses the TerminalDownloader InnerTube
+// client. The parser here only serves as a last resort when the engine
+// errors out or MUSICLE_NO_ENGINE is set.
 func DownloadYouTubeTrack(urlOrID string, cb download.ProgressCallback) (*download.TrackInfo, []byte, error) {
-	if track, raw, err := downloadWithYTDLP(urlOrID, cb); err == nil && len(raw) > 64 {
-		return track, raw, nil
-	} else if cb != nil {
-		cb(5, "yt-dlp failed, trying direct parse...")
-	}
-
 	html, err := FetchYouTubePage(urlOrID)
 	if err != nil {
 		return nil, nil, classifyYouTubeError(fmt.Errorf("fetch page: %w", err))
@@ -452,269 +375,6 @@ func downloadFromStream(pr *ParseResult, stream *StreamInfo, urlOrID string, cb 
 		Thumbnail:   pr.ThumbnailURL,
 	}
 	return track, rawAudio, nil
-}
-
-// ytdlpCookieFlag returns the --cookies-from-browser Chrome argument pair only
-// when a Chrome/Chromium cookie store actually exists, so machines without
-// Google Chrome do not hard-fail (yt-dlp errors out on a missing profile).
-// Without a store we explicitly disable cookie extraction instead.
-func ytdlpCookieFlag() []string {
-	for _, p := range []string{
-		filepath.Join(os.Getenv("HOME"), ".config/google-chrome/Default/Cookies"),
-		filepath.Join(os.Getenv("HOME"), ".config/google-chrome/Cookies"),
-		filepath.Join(os.Getenv("HOME"), ".config/chromium/Default/Cookies"),
-	} {
-		if _, err := os.Stat(p); err == nil {
-			return []string{"--cookies-from-browser", "chrome"}
-		}
-	}
-	return []string{"--no-cookies-from-browser"}
-}
-
-func downloadWithYTDLP(videoID string, cb download.ProgressCallback) (*download.TrackInfo, []byte, error) {
-	ytdlp := findYTDLP()
-	if ytdlp == "" {
-		return nil, nil, fmt.Errorf("yt-dlp not found — YouTube now requires it for downloads. Install yt-dlp or bundle it")
-	}
-
-	if cb != nil {
-		cb(10, "Downloading via yt-dlp...")
-	}
-
-	watchURL := videoID
-	if !strings.HasPrefix(videoID, "http") {
-		watchURL = "https://www.youtube.com/watch?v=" + videoID
-	}
-
-	// Use yt-dlp with --print to get metadata and --output to download
-	// Get metadata first via --dump-json
-	if cb != nil {
-		cb(11, "Getting metadata...")
-	}
-
-	jsonCtx, jsonCancel := context.WithTimeout(context.Background(), 15*time.Second)
-	// NOTE: do NOT force --extractor-args youtube:player_client=web. The web
-	// client frequently returns "Requested format is not available" because it
-	// does not expose a compatible audio-only stream; letting yt-dlp auto-select
-	// the client (android_vr, etc.) avoids that crash.
-	metaArgs := append([]string{"--dump-json", "--no-warnings", "--no-playlist"}, ytdlpCookieFlag()...)
-	metaArgs = append(metaArgs, watchURL)
-	metaCmd := exec.CommandContext(jsonCtx, ytdlp, metaArgs...)
-	var metaJSON bytes.Buffer
-	var metaStderr bytes.Buffer
-	metaCmd.Stdout = &metaJSON
-	metaCmd.Stderr = &metaStderr
-	metaCmd.Run()
-	jsonCancel()
-
-	title := "Unknown"
-	channel := "Unknown"
-	duration := 0.0
-	thumbnail := ""
-
-	if metaJSON.Len() > 0 {
-		var meta struct {
-			Title     string  `json:"title"`
-			Channel   string  `json:"channel"`
-			Duration  float64 `json:"duration"`
-			Thumbnail string  `json:"thumbnail"`
-		}
-		if err := json.Unmarshal(metaJSON.Bytes(), &meta); err == nil {
-			title = meta.Title
-			channel = meta.Channel
-			duration = meta.Duration
-			thumbnail = meta.Thumbnail
-		}
-	}
-
-	if cb != nil {
-		cb(20, fmt.Sprintf("Downloading %s...", title))
-	}
-
-	// Download best audio to a temp file (any container). Reading into a file
-	// instead of stdout sidesteps the "[ext=webm] not available" failure and
-	// lets the conversion step (ffmpeg) handle WebM/Opus/M4A/Ogg uniformly.
-	tmpDir, err := os.MkdirTemp("", "musicle_yt_")
-	if err != nil {
-		return nil, nil, fmt.Errorf("temp dir: %w", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
-	defer cancel()
-
-	// Fallback chain instead of strict bestaudio: some clients hide the
-	// audio-only stream, and failing hard there used to burn minutes in
-	// client-rotation retries. m4a audio converts identically via ffmpeg.
-	dlArgs := append([]string{"-f", "bestaudio[ext=webm]/bestaudio[ext=opus]/bestaudio/best", "-o", filepath.Join(tmpDir, "audio.%(ext)s"), "--no-warnings", "--no-playlist", "--socket-timeout", "25", "--retries", "2"}, ytdlpCookieFlag()...)
-	dlArgs = append(dlArgs, watchURL)
-	cmd := exec.CommandContext(ctx, ytdlp, dlArgs...)
-
-	var errBuf bytes.Buffer
-	cmd.Stderr = &errBuf
-
-	if err := cmd.Run(); err != nil {
-		stderrStr := strings.TrimSpace(errBuf.String())
-		if stderrStr != "" {
-			return nil, nil, fmt.Errorf("yt-dlp: %w\n%s", err, stderrStr)
-		}
-		return nil, nil, fmt.Errorf("yt-dlp: %w", err)
-	}
-
-	srcFile, err := findDownloadedAudio(tmpDir, "audio")
-	if err != nil {
-		stderrStr := strings.TrimSpace(errBuf.String())
-		return nil, nil, fmt.Errorf("yt-dlp output missing: %w\n%s", err, stderrStr)
-	}
-
-	rawAudio, err := os.ReadFile(srcFile)
-	if err != nil {
-		return nil, nil, fmt.Errorf("read audio: %w", err)
-	}
-	if len(rawAudio) < 64 {
-		return nil, nil, fmt.Errorf("yt-dlp output too small (%d bytes)", len(rawAudio))
-	}
-
-	format := strings.TrimPrefix(strings.ToLower(filepath.Ext(srcFile)), ".")
-
-	if cb != nil {
-		cb(90, "Downloaded, processing...")
-	}
-
-	track := &download.TrackInfo{
-		Title:       title,
-		Artist:      channel,
-		Album:       channel,
-		DurationSec: duration,
-		StreamURL:   watchURL,
-		Format:      format,
-		ContentLen:  int64(len(rawAudio)),
-		Thumbnail:   thumbnail,
-	}
-	return track, rawAudio, nil
-}
-
-// findDownloadedAudio returns the path of the audio file produced by yt-dlp
-// inside dir with the given base name (any audio container extension).
-func findDownloadedAudio(dir, base string) (string, error) {
-	matches, _ := filepath.Glob(filepath.Join(dir, base+".*"))
-	for _, m := range matches {
-		ext := strings.ToLower(filepath.Ext(m))
-		switch ext {
-		case ".webm", ".m4a", ".opus", ".ogg", ".mp4", ".flac", ".mp3":
-			return m, nil
-		}
-	}
-	return "", fmt.Errorf("yt-dlp audio file not found in %s", dir)
-}
-
-// DownloadYouTubeTrackDirectMP3 downloads a YouTube track directly as MP3 using yt-dlp + ffmpeg.
-// This bypasses the pure Go WebM/Opus pipeline entirely and is much more reliable.
-// Returns the MP3 bytes and track metadata.
-func DownloadYouTubeTrackDirectMP3(videoID string, cb download.ProgressCallback) (*download.TrackInfo, []byte, error) {
-	ytdlp := findYTDLP()
-	if ytdlp == "" {
-		return nil, nil, fmt.Errorf("yt-dlp not found")
-	}
-
-	ffmpeg := findFFmpeg()
-	if ffmpeg == "" {
-		return nil, nil, fmt.Errorf("ffmpeg not found")
-	}
-
-	watchURL := videoID
-	if !strings.HasPrefix(videoID, "http") {
-		watchURL = "https://www.youtube.com/watch?v=" + videoID
-	}
-
-	if cb != nil {
-		cb(5, "Getting metadata...")
-	}
-
-	jsonCtx, jsonCancel := context.WithTimeout(context.Background(), 15*time.Second)
-	metaArgs := append([]string{"--dump-json", "--no-warnings", "--no-playlist"}, ytdlpCookieFlag()...)
-	metaArgs = append(metaArgs, watchURL)
-	metaCmd := exec.CommandContext(jsonCtx, ytdlp, metaArgs...)
-	var metaJSON bytes.Buffer
-	var metaStderr bytes.Buffer
-	metaCmd.Stdout = &metaJSON
-	metaCmd.Stderr = &metaStderr
-	metaCmd.Run()
-	jsonCancel()
-
-	title := "Unknown"
-	channel := "Unknown"
-	duration := 0.0
-	thumbnail := ""
-
-	if metaJSON.Len() > 0 {
-		var meta struct {
-			Title     string  `json:"title"`
-			Channel   string  `json:"channel"`
-			Duration  float64 `json:"duration"`
-			Thumbnail string  `json:"thumbnail"`
-		}
-		if err := json.Unmarshal(metaJSON.Bytes(), &meta); err == nil {
-			title = meta.Title
-			channel = meta.Channel
-			duration = meta.Duration
-			thumbnail = meta.Thumbnail
-		}
-	}
-
-	if cb != nil {
-		cb(10, fmt.Sprintf("Downloading %s as MP3...", title))
-	}
-
-	tmpMp3, err := os.CreateTemp("", "musicle_*.mp3")
-	if err != nil {
-		return nil, nil, fmt.Errorf("temp mp3: %w", err)
-	}
-	tmpMp3Name := tmpMp3.Name()
-	tmpMp3.Close()
-	defer os.Remove(tmpMp3Name)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
-	defer cancel()
-
-	// -f bestaudio first: without it yt-dlp fetches the full video and only
-	// then extracts audio (10x the bytes for a music track).
-	dlArgs := append([]string{"-f", "bestaudio[ext=webm]/bestaudio[ext=opus]/bestaudio/best", "-x", "--audio-format", "mp3", "--audio-quality", "0", "-o", tmpMp3Name, "--no-warnings", "--no-playlist", "--socket-timeout", "25", "--retries", "2"}, ytdlpCookieFlag()...)
-	dlArgs = append(dlArgs, watchURL)
-	cmd := exec.CommandContext(ctx, ytdlp, dlArgs...)
-
-	var outBuf, errBuf bytes.Buffer
-	cmd.Stdout = &outBuf
-	cmd.Stderr = &errBuf
-
-	if err := cmd.Run(); err != nil {
-		stderrStr := strings.TrimSpace(errBuf.String())
-		if stderrStr != "" {
-			return nil, nil, fmt.Errorf("yt-dlp: %w\n%s", err, stderrStr)
-		}
-		return nil, nil, fmt.Errorf("yt-dlp: %w", err)
-	}
-
-	mp3Data, err := os.ReadFile(tmpMp3Name)
-	if err != nil {
-		return nil, nil, fmt.Errorf("read mp3: %w", err)
-	}
-
-	if cb != nil {
-		cb(100, "Downloaded")
-	}
-
-	track := &download.TrackInfo{
-		Title:       title,
-		Artist:      channel,
-		Album:       channel,
-		DurationSec: duration,
-		StreamURL:   watchURL,
-		Format:      "mp3",
-		ContentLen:  int64(len(mp3Data)),
-		Thumbnail:   thumbnail,
-	}
-	return track, mp3Data, nil
 }
 
 func min(a, b int) int {
