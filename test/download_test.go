@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"MusicLeCLI/bridge"
+	"MusicLe/bridge"
 )
 
 func TestFileExists(t *testing.T) {

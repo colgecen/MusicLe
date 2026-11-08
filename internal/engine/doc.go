@@ -1,4 +1,4 @@
-// Package engine is MusicLeCLI's self-contained download engine: a pure-Go
+// Package engine is MusicLe's self-contained download engine: a pure-Go
 // pipeline that turns YouTube or Spotify links into MP3 files with title,
 // artist and cover art embedded — no external binaries required.
 //

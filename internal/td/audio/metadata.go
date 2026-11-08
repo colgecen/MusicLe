@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"MusicLeCLI/internal/td/model"
-	"MusicLeCLI/internal/td/util"
+	"MusicLe/internal/td/model"
+	"MusicLe/internal/td/util"
 	"github.com/dhowden/tag"
 )
 

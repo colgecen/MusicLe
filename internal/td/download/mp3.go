@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"MusicLeCLI/internal/td/encode"
-	"MusicLeCLI/internal/td/model"
+	"MusicLe/internal/td/encode"
+	"MusicLe/internal/td/model"
 )
 
 // mp3Output makes every completed download end up as an MP3. It is process-wide
@@ -65,7 +65,7 @@ func maybeConvertToMP3(ctx context.Context, ti *model.TrackInfo, filePath string
 
 // EncodeProgressStart is where download progress stops and MP3 encoding
 // starts, so the bar moves once instead of resetting between the two phases.
-// Hosts (like the MusicLeCLI engine) use it to label the current phase.
+// Hosts (like the MusicLe engine) use it to label the current phase.
 const EncodeProgressStart = 70.0
 
 // scaleProgress maps a 0-100 callback onto the [lo, hi] slice of a single

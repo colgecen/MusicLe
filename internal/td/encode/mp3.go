@@ -16,7 +16,7 @@ import (
 	"github.com/braheezy/shine-mp3/pkg/mp3"
 	"github.com/pion/opus"
 
-	"MusicLeCLI/internal/td/mp4audio"
+	"MusicLe/internal/td/mp4audio"
 )
 
 const (

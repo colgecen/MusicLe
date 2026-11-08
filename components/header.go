@@ -7,8 +7,8 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 func RenderHeader(width int, activeView string) string {

@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MusicLeCLI/bridge"
-	"MusicLeCLI/state"
+	"MusicLe/bridge"
+	"MusicLe/state"
 )
 
 func TestRunScript_UnknownAction(t *testing.T) {

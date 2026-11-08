@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MusicLeCLI/internal/td/audio"
+	"MusicLe/internal/td/audio"
 )
 
 // oggPackets extracts Opus packets from an Ogg Opus stream (test fixture only).

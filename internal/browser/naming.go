@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"MusicLeCLI/state"
+	"MusicLe/state"
 )
 
 // NextProfileName derives an auto profile display name + folder for a platform.

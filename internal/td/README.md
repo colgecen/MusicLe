@@ -1,7 +1,7 @@
 # internal/td — TerminalDownloader çekirdeği
 
 Bu paketler, TerminalDownloader CLI'ından alınmış **saf Go** indirme/mödülleme
-kodudur. Amaç: MusicLeCLI'nin yt-dlp + ffmpeg dış bağımlılığını kaldırmak.
+kodudur. Amaç: MusicLe'nin yt-dlp + ffmpeg dış bağımlılığını kaldırmak.
 
 | Paket | Görev |
 |---|---|
@@ -13,9 +13,9 @@ kodudur. Amaç: MusicLeCLI'nin yt-dlp + ffmpeg dış bağımlılığını kaldı
 | `audio` | ID3/metadata okuma-yazma, kapak gömme |
 | `model` | Ortak tipler (TrackInfo, Library) |
 | `util` | Dosya adı temizleme, süre biçimlendirme |
-| `logging` | Küçük aktivite logu (varsayılan kapalı; MusicLeCLI `SetFile` çağırmaz) |
+| `logging` | Küçük aktivite logu (varsayılan kapalı; MusicLe `SetFile` çağırmaz) |
 
-Bilinçli olarak alınmayanlar: `storage`, `backup`, `cmd` — MusicLeCLI'nin kendi
+Bilinçli olarak alınmayanlar: `storage`, `backup`, `cmd` — MusicLe'nin kendi
 kütüphane/kayıt (`state.songlist`, `bridge.registerSong`) ve yedekleme katmanı
 zaten var. TerminalDownloader'daki `SaveToPlaylist*` / `SetPlaylistArt`
 fonksiyonları bu yüzden söküldü; kayıt işi `bridge.registerSong` üzerinden yapılır.

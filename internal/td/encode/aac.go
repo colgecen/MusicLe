@@ -7,7 +7,7 @@ import (
 
 	"github.com/tphakala/go-aac/pcm"
 
-	"MusicLeCLI/internal/td/mp4audio"
+	"MusicLe/internal/td/mp4audio"
 )
 
 // aacToMP3 is the MP4/AAC half of ToMP3. It extracts every AAC access unit from

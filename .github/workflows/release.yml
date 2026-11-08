@@ -61,15 +61,15 @@ jobs:
         run: make build VERSION="${RAW#v}"
       - name: Package
         run: |
-          mkdir -p build/musicle-cli_Linux_x86_64
-          cp build/musicle-cli build/musicle-cli_Linux_x86_64/musicle-cli
-          cp README.md build/musicle-cli_Linux_x86_64/ 2>/dev/null || true
-          cd build && tar czf musicle-cli_Linux_x86_64.tar.gz musicle-cli_Linux_x86_64
+          mkdir -p build/musicle_Linux_x86_64
+          cp build/music-le build/musicle_Linux_x86_64/music-le
+          cp README.md build/musicle_Linux_x86_64/ 2>/dev/null || true
+          cd build && tar czf musicle_Linux_x86_64.tar.gz musicle_Linux_x86_64
       - name: Upload
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run:           gh release upload --clobber "$TAG" build/musicle-cli_Linux_x86_64.tar.gz
+        run:           gh release upload --clobber "$TAG" build/musicle_Linux_x86_64.tar.gz
 
   linux-arm64:
     needs: create-release
@@ -98,19 +98,19 @@ jobs:
             tar -C /usr/local -xzf /tmp/go.tgz
             export PATH=/usr/local/go/bin:\$PATH
             go build -ldflags='-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=\$(date -u +%Y-%m-%d)' \
-              -o musicle-cli-linux-arm64 .
+              -o music-le-linux-arm64 .
           "
       - name: Package archive
         run: |
-          mkdir -p build/musicle-cli_Linux_arm64
-          cp musicle-cli-linux-arm64 build/musicle-cli_Linux_arm64/musicle-cli
-          cp README.md build/musicle-cli_Linux_arm64/ 2>/dev/null || true
-          cd build && tar czf musicle-cli_Linux_arm64.tar.gz musicle-cli_Linux_arm64
+          mkdir -p build/musicle_Linux_arm64
+          cp music-le-linux-arm64 build/musicle_Linux_arm64/music-le
+          cp README.md build/musicle_Linux_arm64/ 2>/dev/null || true
+          cd build && tar czf musicle_Linux_arm64.tar.gz musicle_Linux_arm64
       - name: Upload artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run:           gh release upload --clobber "$TAG" build/musicle-cli_Linux_arm64.tar.gz
+        run:           gh release upload --clobber "$TAG" build/musicle_Linux_arm64.tar.gz
 
   windows:
     needs: create-release
@@ -136,20 +136,20 @@ jobs:
         run: |
           go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
-            -o musicle-cli-windows-${{ matrix.arch }}.exe .
+            -o music-le-windows-${{ matrix.arch }}.exe .
       - name: Package archive
         run: |
-          mkdir -p build/musicle-cli_Windows_${{ matrix.arch }}
-          cp musicle-cli-windows-${{ matrix.arch }}.exe build/musicle-cli_Windows_${{ matrix.arch }}/
-          cp README.md build/musicle-cli_Windows_${{ matrix.arch }}/ 2>/dev/null || true
-          cd build && tar czf musicle-cli_Windows_${{ matrix.arch }}.tar.gz musicle-cli_Windows_${{ matrix.arch }}
+          mkdir -p build/musicle_Windows_${{ matrix.arch }}
+          cp music-le-windows-${{ matrix.arch }}.exe build/musicle_Windows_${{ matrix.arch }}/
+          cp README.md build/musicle_Windows_${{ matrix.arch }}/ 2>/dev/null || true
+          cd build && tar czf musicle_Windows_${{ matrix.arch }}.tar.gz musicle_Windows_${{ matrix.arch }}
       - name: Upload artifacts (.exe + archive)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          gh release upload --clobber "$TAG" musicle-cli-windows-${{ matrix.arch }}.exe
-          gh release upload --clobber "$TAG" build/musicle-cli_Windows_${{ matrix.arch }}.tar.gz
+          gh release upload --clobber "$TAG" music-le-windows-${{ matrix.arch }}.exe
+          gh release upload --clobber "$TAG" build/musicle_Windows_${{ matrix.arch }}.tar.gz
 
   appimage:
     needs: create-release
@@ -177,43 +177,43 @@ jobs:
         run: |
           CGO_ENABLED=1 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
-            -o musicle-cli-linux-x86_64.AppDir/usr/bin/musicle-cli .
+            -o musicle-linux-x86_64.AppDir/usr/bin/music-le .
       - name: Prepare AppDir
         run: |
-          APPDIR=musicle-cli-linux-x86_64.AppDir
+          APPDIR=musicle-linux-x86_64.AppDir
           mkdir -p "$APPDIR/usr/bin"
           mkdir -p "$APPDIR/usr/share/applications"
           mkdir -p "$APPDIR/usr/share/icons/hicolor/1024x1024/apps"
           mkdir -p "$APPDIR/usr/share/metainfo"
 
-          cat > "$APPDIR/io.anomalyco.musicle-cli.desktop" << 'DESKTOP'
+          cat > "$APPDIR/io.anomalyco.musicle.desktop" << 'DESKTOP'
           [Desktop Entry]
           Name=MusicLe
           Comment=Terminal music player with playlist management and audio visualization
-          Exec=musicle-cli
-          Icon=io.anomalyco.musicle-cli
+          Exec=music-le
+          Icon=io.anomalyco.musicle
           Terminal=true
           Type=Application
           Categories=Audio;Music;Player;
           StartupNotify=false
           DESKTOP
-          cp "$APPDIR/io.anomalyco.musicle-cli.desktop" "$APPDIR/usr/share/applications/"
+          cp "$APPDIR/io.anomalyco.musicle.desktop" "$APPDIR/usr/share/applications/"
 
-          cp assets/MusicLe.png "$APPDIR/usr/share/icons/hicolor/1024x1024/apps/io.anomalyco.musicle-cli.png"
-          cp assets/MusicLe.png "$APPDIR/io.anomalyco.musicle-cli.png"
+          cp assets/MusicLe.png "$APPDIR/usr/share/icons/hicolor/1024x1024/apps/io.anomalyco.musicle.png"
+          cp assets/MusicLe.png "$APPDIR/io.anomalyco.musicle.png"
 
-          desktop-file-validate "$APPDIR/io.anomalyco.musicle-cli.desktop"
+          desktop-file-validate "$APPDIR/io.anomalyco.musicle.desktop"
       - name: Build AppImage
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
-          ./appimagetool -n musicle-cli-linux-x86_64.AppDir \
-            "musicle-cli_${RAW#v}_x86_64.AppImage"
+          ./appimagetool -n musicle-linux-x86_64.AppDir \
+            "musicle_${RAW#v}_x86_64.AppImage"
       - name: Upload AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
-        run:           gh release upload --clobber "$TAG" musicle-cli_*.AppImage
+        run:           gh release upload --clobber "$TAG" musicle_*.AppImage
 
   macos-intel:
     needs: create-release
@@ -233,13 +233,13 @@ jobs:
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
-            -o musicle-cli-darwin-amd64 .
+            -o music-le-darwin-amd64 .
       - name: Package archive
         run: |
-          mkdir -p build/musicle-cli_macOS_x86_64
-          cp musicle-cli-darwin-amd64 build/musicle-cli_macOS_x86_64/musicle-cli
-          cp README.md build/musicle-cli_macOS_x86_64/ 2>/dev/null || true
-          cd build && tar czf musicle-cli_macOS_x86_64.tar.gz musicle-cli_macOS_x86_64 && cd ..
+          mkdir -p build/musicle_macOS_x86_64
+          cp music-le-darwin-amd64 build/musicle_macOS_x86_64/music-le
+          cp README.md build/musicle_macOS_x86_64/ 2>/dev/null || true
+          cd build && tar czf musicle_macOS_x86_64.tar.gz musicle_macOS_x86_64 && cd ..
       - name: Package .app bundle
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
@@ -247,7 +247,7 @@ jobs:
           APP="build/MusicLe.app"
           rm -rf "$APP"
           mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-          cp musicle-cli-darwin-amd64 "$APP/Contents/MacOS/musicle-cli"
+          cp music-le-darwin-amd64 "$APP/Contents/MacOS/music-le"
           cp assets/MusicLe.png "$APP/Contents/Resources/" 2>/dev/null || true
           sips -s format icns assets/MusicLe.png --out "$APP/Contents/Resources/MusicLe.icns" 2>/dev/null || true
           cat > "$APP/Contents/Info.plist" <<PLIST
@@ -276,9 +276,9 @@ jobs:
           #!/bin/sh
           # TUI apps need a real terminal: open one running the binary.
           HERE="$(cd "$(dirname "$0")" && pwd)"
-          open -a Terminal "$HERE/musicle-cli"
+          open -a Terminal "$HERE/music-le"
           LAUNCHER
-          chmod +x "$APP/Contents/MacOS/MusicLeLauncher" "$APP/Contents/MacOS/musicle-cli"
+          chmod +x "$APP/Contents/MacOS/MusicLeLauncher" "$APP/Contents/MacOS/music-le"
           cd build && rm -f MusicLe-macOS-x86_64.zip && zip -qr MusicLe-macOS-x86_64.zip MusicLe.app && cd ..
       - name: Upload artifacts (.app + archive)
         env:
@@ -286,7 +286,7 @@ jobs:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           gh release upload --clobber "$TAG" build/MusicLe-macOS-x86_64.zip
-          gh release upload --clobber "$TAG" build/musicle-cli_macOS_x86_64.tar.gz
+          gh release upload --clobber "$TAG" build/musicle_macOS_x86_64.tar.gz
 
   macos-arm:
     needs: create-release
@@ -306,13 +306,13 @@ jobs:
         run: |
           CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build \
             -ldflags="-s -w -X main.version=${RAW#v} -X main.commit=${{ github.sha }} -X main.date=$(date -u +%Y-%m-%d)" \
-            -o musicle-cli-darwin-arm64 .
+            -o music-le-darwin-arm64 .
       - name: Package archive
         run: |
-          mkdir -p build/musicle-cli_macOS_arm64
-          cp musicle-cli-darwin-arm64 build/musicle-cli_macOS_arm64/musicle-cli
-          cp README.md build/musicle-cli_macOS_arm64/ 2>/dev/null || true
-          cd build && tar czf musicle-cli_macOS_arm64.tar.gz musicle-cli_macOS_arm64 && cd ..
+          mkdir -p build/musicle_macOS_arm64
+          cp music-le-darwin-arm64 build/musicle_macOS_arm64/music-le
+          cp README.md build/musicle_macOS_arm64/ 2>/dev/null || true
+          cd build && tar czf musicle_macOS_arm64.tar.gz musicle_macOS_arm64 && cd ..
       - name: Package .app bundle
         env:
           RAW: ${{ github.event.inputs.tag || github.ref_name }}
@@ -320,7 +320,7 @@ jobs:
           APP="build/MusicLe.app"
           rm -rf "$APP"
           mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-          cp musicle-cli-darwin-arm64 "$APP/Contents/MacOS/musicle-cli"
+          cp music-le-darwin-arm64 "$APP/Contents/MacOS/music-le"
           cp assets/MusicLe.png "$APP/Contents/Resources/" 2>/dev/null || true
           sips -s format icns assets/MusicLe.png --out "$APP/Contents/Resources/MusicLe.icns" 2>/dev/null || true
           cat > "$APP/Contents/Info.plist" <<PLIST
@@ -349,9 +349,9 @@ jobs:
           #!/bin/sh
           # TUI apps need a real terminal: open one running the binary.
           HERE="$(cd "$(dirname "$0")" && pwd)"
-          open -a Terminal "$HERE/musicle-cli"
+          open -a Terminal "$HERE/music-le"
           LAUNCHER
-          chmod +x "$APP/Contents/MacOS/MusicLeLauncher" "$APP/Contents/MacOS/musicle-cli"
+          chmod +x "$APP/Contents/MacOS/MusicLeLauncher" "$APP/Contents/MacOS/music-le"
           cd build && rm -f MusicLe-macOS-arm64.zip && zip -qr MusicLe-macOS-arm64.zip MusicLe.app && cd ..
       - name: Upload artifacts (.app + archive)
         env:
@@ -359,4 +359,4 @@ jobs:
           TAG: ${{ github.event.inputs.tag || github.ref_name }}
         run: |
           gh release upload --clobber "$TAG" build/MusicLe-macOS-arm64.zip
-          gh release upload --clobber "$TAG" build/musicle-cli_macOS_arm64.tar.gz
+          gh release upload --clobber "$TAG" build/musicle_macOS_arm64.tar.gz

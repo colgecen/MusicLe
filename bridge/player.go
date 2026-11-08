@@ -15,8 +15,8 @@ import (
 	"github.com/gopxl/beep/mp3"
 	"github.com/gopxl/beep/speaker"
 
-	"MusicLeCLI/internal/audio"
-	"MusicLeCLI/state"
+	"MusicLe/internal/audio"
+	"MusicLe/state"
 	"github.com/gopxl/beep/wav"
 )
 

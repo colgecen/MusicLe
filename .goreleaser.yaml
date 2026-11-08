@@ -1,3 +1,5 @@
+project_name: musicle
+
 version: 2
 
 before:
@@ -6,6 +8,7 @@ before:
 
 builds:
   - id: linux
+    binary: music-le
     goos:
       - linux
     goarch:
@@ -16,6 +19,7 @@ builds:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
   - id: windows
+    binary: music-le
     goos:
       - windows
     goarch:
@@ -57,14 +61,14 @@ archives:
 
 nfpms:
   - id: linux
-    package_name: muscle-cli
+    package_name: musicle
     builds:
       - linux
     file_name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-    homepage: https://github.com/anomalyco/musicle-cli
-    maintainer: Musicle CLI Maintainers
+    homepage: https://github.com/anomalyco/musicle
+    maintainer: MusicLe Maintainers
     description: |-
-      Musicle CLI - Terminal music player
+      MusicLe - Terminal music player
       A terminal-based music player with playlist management and audio visualization.
     license: MIT
     bindir: /usr/local/bin
@@ -73,7 +77,7 @@ nfpms:
       - rpm
     contents:
       - src: README.md
-        dst: /usr/local/share/doc/musicle-cli/README.md
+        dst: /usr/local/share/doc/musicle/README.md
 
 checksum:
   name_template: 'checksums.txt'

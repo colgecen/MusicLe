@@ -1,8 +1,8 @@
 package main
 
 import (
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 // TrFor returns the translation for key in the given language (English

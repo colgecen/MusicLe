@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	tddl "MusicLeCLI/internal/td/download"
-	tdyt "MusicLeCLI/internal/td/youtube"
+	tddl "MusicLe/internal/td/download"
+	tdyt "MusicLe/internal/td/youtube"
 )
 
 // noopProgress discards progress events; used when the caller passes none.
@@ -49,7 +49,7 @@ func downloadWithTD(urls []string, outDir string, strict bool, progress Progress
 	if err := applyCookieFile(); err != nil {
 		return fmt.Errorf("engine: cookies dosyasi okunamadi: %w", err)
 	}
-	// MusicLeCLI always hands the player MP3; the engine converts whenever
+	// MusicLe always hands the player MP3; the engine converts whenever
 	// YouTube served Opus/AAC instead.
 	tddl.SetMP3Output(true)
 

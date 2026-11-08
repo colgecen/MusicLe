@@ -1,9 +1,9 @@
-<h1 align="center">MusicLe CLI</h1>
+<h1 align="center">MusicLe</h1>
 
 <p align="center">A Spotify-inspired music player and personal library manager that runs in your terminal (Go + Bubble Tea).</p>
 
 <p align="center">
-  <img src="assets/musicle-demo.gif" alt="MusicLe CLI demo" width="700">
+  <img src="assets/musicle-demo.gif" alt="MusicLe demo" width="700">
 </p>
 
 ## Features
@@ -23,26 +23,26 @@
 Build and run the project locally:
 
 ```bash
-git clone https://github.com/colgecen/MusicLeCLI.git
-cd MusicLeCLI
-go build -o musicle-cli .
+git clone https://github.com/colgecen/MusicLe.git
+cd MusicLe
+go build -o music-le .
 ```
 
 To produce packages with the menu-driven build tool:
 
 ```bash
-musiclecli
+musicle
 ```
 
 Pick a target and format (Linux: AppImage/RPM/tar.gz/binary, Windows: .exe/.exe+zip, macOS: tar.gz/binary).
-Prebuilt binaries are on the [releases](https://github.com/colgecen/MusicLeCLI/releases) page.
+Prebuilt binaries are on the [releases](https://github.com/colgecen/MusicLe/releases) page.
 
 ## Usage
 
 Run it with:
 
 ```bash
-./build/musicle-cli
+./build/music-le
 ```
 
 Paste a Spotify or YouTube link into the Download tab and choose the target playlist; the tracks show up in your library once the download finishes. On the main screen browse the list with `↑↓` and press `Enter` to play, press `F1` to focus the player bar for volume and seeking, and change language, theme and audio output from the Settings tab.
@@ -52,7 +52,7 @@ Configuration lives in `~/.config/musicle/config.json`, the music archive under 
 ## Screenshots
 
 <p align="center">
-  <img src="assets/musicle-app.png" alt="MusicLe CLI main screen">
+  <img src="assets/musicle-app.png" alt="MusicLe main screen">
 </p>
 
 ## License

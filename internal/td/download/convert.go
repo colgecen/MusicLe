@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"MusicLeCLI/internal/td/audio"
-	"MusicLeCLI/internal/td/encode"
+	"MusicLe/internal/td/audio"
+	"MusicLe/internal/td/encode"
 )
 
 // ConvertToMP3 converts an existing WebM/Opus or MP4/AAC file into MP3 in

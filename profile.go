@@ -7,8 +7,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 type ProfileModel struct {
@@ -40,7 +40,7 @@ func NewProfileModel() *ProfileModel {
 		nameInput: func() textinput.Model {
 			ti := textinput.New()
 			ti.Prompt = Tr("profile.name_prompt")
-			ti.Placeholder = "MusicLeCLI User"
+			ti.Placeholder = "MusicLe User"
 			ti.Width = 60
 			return ti
 		}(),

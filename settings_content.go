@@ -1,21 +1,21 @@
 package main
 
-import "MusicLeCLI/state"
+import "MusicLe/state"
 
-// policiesContent returns the Musicle usage policies in the current language.
+// policiesContent returns the MusicLe usage policies in the current language.
 func policiesContent() string {
 	switch state.Current.Language {
 	case state.LangTurkish:
-		return `Musicle Kullanım Politikaları
+		return `MusicLe Kullanım Politikaları
 
 1. Kişisel kullanım
-Musicle, yalnızca kişisel müzik arşivinizi oluşturmak ve yönetmek için
+MusicLe, yalnızca kişisel müzik arşivinizi oluşturmak ve yönetmek için
 tasarlanmış ücretsiz, açık kaynaklı bir araçtır. Ticari amaçlı kullanım
 önerilmez.
 
 2. Telif hakkı ve yasal sorumluluk
 İndirdiğiniz içeriklerin telif haklarına ve bulunduğunuz ülkenin yasalarına
-uymak tamamen sizin sorumluluğunuzdadır. Musicle, içeriğin yasal durumunu
+uymak tamamen sizin sorumluluğunuzdadır. MusicLe, içeriğin yasal durumunu
 denetlemez ve herhangi bir yasal tavsiye vermez.
 
 3. Dağıtım yasağı
@@ -31,23 +31,23 @@ davranışı değişebilir.
 
 5. Gizlilik
 Kimlik bilgileri (örn. tarayıcı çerezleri) yalnızca oturum boyunca yerel
-olarak kullanılır; Musicle hiçbir kişisel veriyi harici sunucuya göndermez.
+olarak kullanılır; MusicLe hiçbir kişisel veriyi harici sunucuya göndermez.
 Yapılandırma yalnızca makinenizdeki config.json dosyasında saklanır.
 
 6. Sorumluluk reddi
 Bu yazılım "olduğu gibi" sunulur, garanti verilmez. Yanlış kullanımdan
 kaynaklanan sonuçlardan geliştirici sorumlu tutulamaz.`
 	case state.LangSpanish:
-		return `Políticas de uso de Musicle
+		return `Políticas de uso de MusicLe
 
 1. Uso personal
-Musicle es una herramienta gratuita de código abierto diseñada solo para
+MusicLe es una herramienta gratuita de código abierto diseñada solo para
 crear y gestionar tu archivo personal de música. No se recomienda el uso
 comercial.
 
 2. Derechos de autor y responsabilidad legal
 Respetar los derechos de autor y las leyes de tu país es totalmente tu
-responsabilidad. Musicle no supervisa el estado legal del contenido ni
+responsabilidad. MusicLe no supervisa el estado legal del contenido ni
 ofrece asesoramiento legal.
 
 3. Prohibición de distribución
@@ -61,23 +61,23 @@ ellos cambian.
 
 5. Privacidad
 Las credenciales (p. ej. cookies del navegador) solo se usan localmente
-durante la sesión; Musicle no envía datos personales a ningún servidor.
+durante la sesión; MusicLe no envía datos personales a ningún servidor.
 La configuración solo se guarda en config.json en tu máquina.
 
 6. Exención de responsabilidad
 Este software se ofrece "tal cual", sin garantía. El desarrollador no es
 responsable de las consecuencias del mal uso.`
 	case state.LangGerman:
-		return `Musicle Nutzungsrichtlinien
+		return `MusicLe Nutzungsrichtlinien
 
 1. Persönliche Nutzung
-Musicle ist ein kostenloses Open-Source-Tool nur zum Erstellen und
+MusicLe ist ein kostenloses Open-Source-Tool nur zum Erstellen und
 Verwalten deines persönlichen Musikarchivs. Kommerzielle Nutzung wird
 nicht empfohlen.
 
 2. Urheberrecht und rechtliche Verantwortung
 Die Einhaltung von Urheberrechten und Gesetzen deines Landes liegt voll
-in deiner Verantwortung. Musicle prüft den Rechtsstatus nicht und gibt
+in deiner Verantwortung. MusicLe prüft den Rechtsstatus nicht und gibt
 keine Rechtsberatung.
 
 3. Verbreitungsverbot
@@ -91,23 +91,23 @@ sich bei Änderungen dort anders verhalten.
 
 5. Datenschutz
 Anmeldedaten (z. B. Browser-Cookies) werden nur lokal während der Sitzung
-verwendet; Musicle sendet keine persönlichen Daten an Server. Die
+verwendet; MusicLe sendet keine persönlichen Daten an Server. Die
 Konfiguration liegt nur in config.json auf deinem Rechner.
 
 6. Haftungsausschluss
 Diese Software wird "wie sie ist" ohne Garantie bereitgestellt. Der
 Entwickler haftet nicht für Folgen falscher Nutzung.`
 	case state.LangFrench:
-		return `Politiques d'utilisation de Musicle
+		return `Politiques d'utilisation de MusicLe
 
 1. Usage personnel
-Musicle est un outil gratuit et open source conçu uniquement pour créer
+MusicLe est un outil gratuit et open source conçu uniquement pour créer
 et gérer votre bibliothèque musicale personnelle. L'usage commercial est
 déconseillé.
 
 2. Droits d'auteur et responsabilité légale
 Respecter les droits d'auteur et les lois de votre pays relève entièrement
-de votre responsabilité. Musicle ne contrôle pas le statut légal du contenu
+de votre responsabilité. MusicLe ne contrôle pas le statut légal du contenu
 et ne donne aucun conseil juridique.
 
 3. Interdiction de distribution
@@ -121,7 +121,7 @@ changent.
 
 5. Confidentialité
 Les identifiants (ex. cookies du navigateur) ne sont utilisés que
-localement pendant la session ; Musicle n'envoie aucune donnée personnelle
+localement pendant la session ; MusicLe n'envoie aucune donnée personnelle
 vers un serveur. La configuration est stockée dans config.json sur votre
 machine.
 
@@ -129,14 +129,14 @@ machine.
 Ce logiciel est fourni "tel quel", sans garantie. Le développeur n'est pas
 responsable des conséquences d'une mauvaise utilisation.`
 	case state.LangArabic:
-		return `سياسات استخدام Musicle
+		return `سياسات استخدام MusicLe
 
 1. الاستخدام الشخصي
-Musicle أداة مجانية مفتوحة المصدر مصممة فقط لإنشاء وإدارة مكتبتك
+MusicLe أداة مجانية مفتوحة المصدر مصممة فقط لإنشاء وإدارة مكتبتك
 الموسيقية الشخصية. لا يُنصح بالاستخدام التجاري.
 
 2. حقوق النشر والمسؤولية القانونية
-الالتزام بحقوق النشر وقوانين بلدك مسؤوليتك الكاملة. لا يتحقق Musicle من
+الالتزام بحقوق النشر وقوانين بلدك مسؤوليتك الكاملة. لا يتحقق MusicLe من
 الوضع القانوني للمحتوى ولا يقدم أي استشارة قانونية.
 
 3. حظر التوزيع
@@ -149,23 +149,23 @@ Musicle أداة مجانية مفتوحة المصدر مصممة فقط لإن
 
 5. الخصوصية
 تُستخدم بيانات الاعتماد (مثل كوكيز المتصفح) محلياً فقط أثناء الجلسة؛ لا
-يرسل Musicle أي بيانات شخصية إلى خوادم خارجية. تُحفظ الإعدادات في
+يرسل MusicLe أي بيانات شخصية إلى خوادم خارجية. تُحفظ الإعدادات في
 config.json على جهازك فقط.
 
 6. إخلاء المسؤولية
 يُقدم هذا البرنامج "كما هو" دون ضمان. المطور غير مسؤول عن نتائج سوء
 الاستخدام.`
 	case state.LangPortuguese:
-		return `Políticas de uso do Musicle
+		return `Políticas de uso do MusicLe
 
 1. Uso pessoal
-O Musicle é uma ferramenta gratuita de código aberto feita apenas para
+O MusicLe é uma ferramenta gratuita de código aberto feita apenas para
 criar e gerir o teu arquivo pessoal de música. O uso comercial não é
 recomendado.
 
 2. Direitos de autor e responsabilidade legal
 Respeitar os direitos de autor e as leis do teu país é totalmente tua
-responsabilidade. O Musicle não verifica o estado legal do conteúdo nem
+responsabilidade. O MusicLe não verifica o estado legal do conteúdo nem
 dá aconselhamento jurídico.
 
 3. Proibição de distribuição
@@ -178,20 +178,20 @@ depende das suas APIs ou endpoints públicos e pode mudar se eles mudarem.
 
 5. Privacidade
 As credenciais (ex. cookies do navegador) só são usadas localmente durante
-a sessão; o Musicle não envia dados pessoais para nenhum servidor. A
+a sessão; o MusicLe não envia dados pessoais para nenhum servidor. A
 configuração fica só em config.json na tua máquina.
 
 6. Isenção de responsabilidade
 Este software é fornecido "como está", sem garantia. O programador não é
 responsável pelas consequências do mau uso.`
 	case state.LangChinese:
-		return `Musicle 使用政策
+		return `MusicLe 使用政策
 
 1. 个人使用
-Musicle 是仅用于创建和管理个人音乐档案的免费开源工具。不建议商业用途。
+MusicLe 是仅用于创建和管理个人音乐档案的免费开源工具。不建议商业用途。
 
 2. 版权与法律责任
-遵守所下载内容的版权及所在国家法律完全是您的责任。Musicle 不审查内容的
+遵守所下载内容的版权及所在国家法律完全是您的责任。MusicLe 不审查内容的
 合法状态，也不提供任何法律建议。
 
 3. 禁止分发
@@ -203,21 +203,21 @@ Musicle 是仅用于创建和管理个人音乐档案的免费开源工具。不
 公开接口，平台变更时行为可能发生变化。
 
 5. 隐私
-凭证（如浏览器 Cookie）仅在会话期间本地使用；Musicle 不会向外部服务器
+凭证（如浏览器 Cookie）仅在会话期间本地使用；MusicLe 不会向外部服务器
 发送任何个人数据。配置仅保存在本机的 config.json 文件中。
 
 6. 免责声明
 本软件按“现状”提供，不作任何保证。因误用导致的后果开发者不承担责任。`
 	case state.LangJapanese:
-		return `Musicle 利用ポリシー
+		return `MusicLe 利用ポリシー
 
 1. 個人利用
-Musicleは個人の音楽アーカイブの作成・管理専用の無料オープンソースツール
+MusicLeは個人の音楽アーカイブの作成・管理専用の無料オープンソースツール
 です。商用利用は推奨されません。
 
 2. 著作権と法的責任
 ダウンロードしたコンテンツの著作権およびお住まいの国の法律を守ることは
-すべて利用者の責任です。Musicleは合法性を確認せず、法的助言もしません。
+すべて利用者の責任です。MusicLeは合法性を確認せず、法的助言もしません。
 
 3. 配布禁止
 権利者の許可なくファイルを販売・再共有・公開することは禁止です。本ツール
@@ -229,7 +229,7 @@ SpotifyやYouTube等の利用条件を守る必要があります。本ツール
 ことがあります。
 
 5. プライバシー
-認証情報（ブラウザCookie等）はセッション中のみローカルで使用し、Musicle
+認証情報（ブラウザCookie等）はセッション中のみローカルで使用し、MusicLe
 は個人データを外部サーバーに送信しません。設定は端末内のconfig.jsonに
 のみ保存されます。
 
@@ -237,15 +237,15 @@ SpotifyやYouTube等の利用条件を守る必要があります。本ツール
 本ソフトウェアは「現状のまま」提供され、保証はありません。誤用による結果
 について開発者は責任を負いません。`
 	case state.LangItalian:
-		return `Politiche di utilizzo di Musicle
+		return `Politiche di utilizzo di MusicLe
 
 1. Uso personale
-Musicle è uno strumento gratuito e open source pensato solo per creare e
+MusicLe è uno strumento gratuito e open source pensato solo per creare e
 gestire il tuo archivio musicale personale. L'uso commerciale è sconsigliato.
 
 2. Diritto d'autore e responsabilità legale
 Rispettare il diritto d'autore e le leggi del tuo paese è interamente tua
-responsabilità. Musicle non verifica lo stato legale dei contenuti e non
+responsabilità. MusicLe non verifica lo stato legale dei contenuti e non
 fornisce consulenza legale.
 
 3. Divieto di distribuzione
@@ -258,23 +258,23 @@ dipende dalle loro API o endpoint pubblici e può cambiare se cambiano loro.
 
 5. Privacy
 Le credenziali (es. cookie del browser) sono usate solo localmente durante
-la sessione; Musicle non invia dati personali ad alcun server. La
+la sessione; MusicLe non invia dati personali ad alcun server. La
 configurazione è salvata solo in config.json sulla tua macchina.
 
 6. Esclusione di responsabilità
 Questo software è fornito "così com'è", senza garanzia. Lo sviluppatore non
 è responsabile delle conseguenze dell'uso improprio.`
 	case state.LangRussian:
-		return `Правила использования Musicle
+		return `Правила использования MusicLe
 
 1. Личное использование
-Musicle — бесплатный инструмент с открытым кодом только для создания и
+MusicLe — бесплатный инструмент с открытым кодом только для создания и
 управления личным музыкальным архивом. Коммерческое использование не
 рекомендуется.
 
 2. Авторские права и юридическая ответственность
 Соблюдение авторских прав и законов вашей страны — полностью ваша
-ответственность. Musicle не проверяет правовой статус контента и не даёт
+ответственность. MusicLe не проверяет правовой статус контента и не даёт
 юридических консультаций.
 
 3. Запрет распространения
@@ -288,22 +288,22 @@ Musicle — бесплатный инструмент с открытым код
 
 5. Конфиденциальность
 Учётные данные (напр. cookie браузера) используются только локально в
-течение сессии; Musicle не отправляет личные данные на внешние серверы.
+течение сессии; MusicLe не отправляет личные данные на внешние серверы.
 Настройки хранятся только в config.json на вашем компьютере.
 
 6. Отказ от ответственности
 ПО предоставляется "как есть", без гарантий. Разработчик не отвечает за
 последствия неправильного использования.`
 	default:
-		return `Musicle Usage Policies
+		return `MusicLe Usage Policies
 
 1. Personal use
-Musicle is a free, open-source tool designed only to create and manage
+MusicLe is a free, open-source tool designed only to create and manage
 your personal music archive. Commercial use is not recommended.
 
 2. Copyright and legal responsibility
 Respecting copyrights and the laws of your country is entirely your
-responsibility. Musicle does not review the legal status of content and
+responsibility. MusicLe does not review the legal status of content and
 gives no legal advice.
 
 3. Distribution ban
@@ -317,7 +317,7 @@ change when they change.
 
 5. Privacy
 Credentials (e.g. browser cookies) are only used locally during the
-session; Musicle sends no personal data to any external server.
+session; MusicLe sends no personal data to any external server.
 Configuration is stored only in config.json on your machine.
 
 6. Disclaimer
@@ -331,7 +331,7 @@ liable for consequences of misuse.`
 func extrasContent() string {
 	switch state.Current.Language {
 	case state.LangTurkish:
-		return `Musicle Ekstralar
+		return `MusicLe Ekstralar
 
 Klavye Kısayolları
 Genel:
@@ -360,7 +360,7 @@ Daha Fazla Bilgi
 - Tüm yapılandırma yalnızca makinenizdeki config.json dosyasında saklanır;
   hiçbir kişisel veri harici sunucuya gönderilmez.`
 	case state.LangSpanish:
-		return `Musicle Extras
+		return `MusicLe Extras
 
 Atajos de teclado
 General:
@@ -387,7 +387,7 @@ Más información
   herramientas de terceros.
 - Todo se guarda solo en config.json en tu máquina.`
 	case state.LangGerman:
-		return `Musicle Extras
+		return `MusicLe Extras
 
 Tastenkürzel
 Allgemein:
@@ -414,7 +414,7 @@ Weitere Infos
   und Drittanbieter-Tools.
 - Alles wird nur in config.json auf deinem Rechner gespeichert.`
 	case state.LangFrench:
-		return `Musicle Extras
+		return `MusicLe Extras
 
 Raccourcis clavier
 Général :
@@ -440,7 +440,7 @@ Plus d'infos
 - Onglets Politiques et À propos : droits, confidentialité et outils tiers.
 - Tout est stocké uniquement dans config.json sur votre machine.`
 	case state.LangArabic:
-		return `إضافات Musicle
+		return `إضافات MusicLe
 
 اختصارات لوحة المفاتيح
 عام:
@@ -465,7 +465,7 @@ Plus d'infos
 - في تبويبي السياسات وحول تجد تفاصيل الحقوق والخصوصية وأدوات الطرف الثالث.
 - كل الإعدادات في config.json على جهازك فقط.`
 	case state.LangPortuguese:
-		return `Musicle Extras
+		return `MusicLe Extras
 
 Atalhos de teclado
 Geral:
@@ -492,7 +492,7 @@ Mais informação
   e ferramentas de terceiros.
 - Tudo fica só em config.json na tua máquina.`
 	case state.LangChinese:
-		return `Musicle 附加功能
+		return `MusicLe 附加功能
 
 键盘快捷键
 通用：
@@ -517,7 +517,7 @@ Mais informação
 - 在政策与关于页可查看版权、隐私及第三方工具详情。
 - 所有配置仅保存在本机 config.json，不会外传。`
 	case state.LangJapanese:
-		return `Musicle 追加機能
+		return `MusicLe 追加機能
 
 キーボードショートカット
 一般:
@@ -542,7 +542,7 @@ Mais informação
 - ポリシー・についてタブに権利・プライバシー・第三者ツールの詳細あり。
 - 設定は端末内config.jsonのみに保存されます。`
 	case state.LangItalian:
-		return `Musicle Extra
+		return `MusicLe Extra
 
 Scorciatoie tastiera
 Generali:
@@ -567,7 +567,7 @@ Altre info
 - Nelle schede Politiche e Info trovi diritti, privacy e tool di terze parti.
 - Tutto è salvato solo in config.json sulla tua macchina.`
 	case state.LangRussian:
-		return `Musicle Дополнительно
+		return `MusicLe Дополнительно
 
 Горячие клавиши
 Общее:
@@ -592,7 +592,7 @@ Altre info
 - Во вкладках Правила и О приложении — права, приватность и сторонние tools.
 - Всё хранится только в config.json на вашем компьютере.`
 	default:
-		return `Musicle Extras
+		return `MusicLe Extras
 
 Keyboard Shortcuts
 General:
@@ -623,7 +623,7 @@ More Info
 func aboutContent() string {
 	switch state.Current.Language {
 	case state.LangTurkish:
-		return `Musicle Hakkında
+		return `MusicLe Hakkında
 
 Proje ne zaman başladı?
 26 Mart 2026'da ilk kod yapısı oluşturularak geliştirmeye başlandı.
@@ -642,7 +642,7 @@ kaynaklardan indirip yerel olarak yönetmesine yarar.
 Amaç?
 Mevcut müzik akış platformlarındaki parçaları kendi kontrolünüzdeki bir
 yerel arşive dönüştürmek; çevrimdışı dinleme, düzenleme ve kalıcı saklama
-sağlamak. Musicle bir akış servisi değildir, bir kişisel arşiv yöneticisidir.
+sağlamak. MusicLe bir akış servisi değildir, bir kişisel arşiv yöneticisidir.
 
 Temel özellikler
 - Spotify ve YouTube desteği ile parça ve çalma listesi indirme.
@@ -656,7 +656,7 @@ Kullanılan 3. taraf araçlar
 - TerminalDownloader: saf Go indirme ve MP3 kodlama motoru.
 - Spotify: meta veri ve arama için veri kaynağı.`
 	case state.LangSpanish:
-		return `Acerca de Musicle
+		return `Acerca de MusicLe
 
 ¿Cuándo empezó el proyecto?
 El 26 de marzo de 2026 con la primera estructura de código.
@@ -689,7 +689,7 @@ Terceros
 - TerminalDownloader: motor de descarga y codificación MP3 en Go puro.
 - Spotify: metadatos y búsqueda.`
 	case state.LangGerman:
-		return `Über Musicle
+		return `Über MusicLe
 
 Wann startete das Projekt?
 Am 26. März 2026 mit der ersten Code-Struktur.
@@ -722,7 +722,7 @@ Drittanbieter
 - TerminalDownloader: Pure-Go-Download- und MP3-Enkodierung.
 - Spotify: Metadaten und Suche.`
 	case state.LangFrench:
-		return `À propos de Musicle
+		return `À propos de MusicLe
 
 Quand le projet a-t-il commencé ?
 Le 26 mars 2026 avec la première structure de code.
@@ -755,7 +755,7 @@ Tiers
 - TerminalDownloader : moteur de téléchargement et d’encodage MP3 en Go pur.
 - Spotify : métadonnées et recherche.`
 	case state.LangArabic:
-		return `حول Musicle
+		return `حول MusicLe
 
 متى بدأ المشروع؟
 في 26 مارس 2026 بأول هيكل برمجي.
@@ -786,7 +786,7 @@ GitHub: @colgecen
 - TerminalDownloader: محرك تنزيل وترميز MP3 بلغة Go الخالصة.
 - Spotify: بيانات وصفية وبحث.`
 	case state.LangPortuguese:
-		return `Sobre o Musicle
+		return `Sobre o MusicLe
 
 Quando começou o projeto?
 A 26 de março de 2026 com a primeira estrutura de código.
@@ -819,7 +819,7 @@ Terceiros
 - TerminalDownloader: motor de download e codificação MP3 em Go puro.
 - Spotify: metadados e pesquisa.`
 	case state.LangChinese:
-		return `关于 Musicle
+		return `关于 MusicLe
 
 项目何时开始？
 2026年3月26日，首个代码结构搭建时开始。
@@ -850,7 +850,7 @@ GitHub：@colgecen
 - TerminalDownloader：纯 Go 下载与 MP3 编码引擎。
 - Spotify：元数据与搜索数据源。`
 	case state.LangJapanese:
-		return `Musicle について
+		return `MusicLe について
 
 プロジェクト開始は？
 2026年3月26日に最初のコード構造で開発開始。
@@ -881,7 +881,7 @@ SpotifyやYouTubeから個人の音楽ライブラリをダウンロードしロ
 - TerminalDownloader: ピュアGoのダウンロード・MP3エンコードエンジン。
 - Spotify: メタデータと検索ソース。`
 	case state.LangItalian:
-		return `Info su Musicle
+		return `Info su MusicLe
 
 Quando è iniziato il progetto?
 Il 26 marzo 2026 con la prima struttura di codice.
@@ -914,7 +914,7 @@ Terze parti
 - TerminalDownloader: motore di download e codifica MP3 in Go puro.
 - Spotify: metadati e ricerca.`
 	case state.LangRussian:
-		return `О Musicle
+		return `О MusicLe
 
 Когда начался проект?
 26 марта 2026 года с первой структуры кода.
@@ -947,7 +947,7 @@ GitHub: @colgecen
 - TerminalDownloader: движок загрузки и кодирования MP3 на чистом Go.
 - Spotify: метаданные и поиск.`
 	default:
-		return `About Musicle
+		return `About MusicLe
 
 When did the project start?
 On 26 March 2026 with the first code structure.

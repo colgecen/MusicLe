@@ -12,8 +12,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/ncruces/zenity"
 
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 type logEntry struct {

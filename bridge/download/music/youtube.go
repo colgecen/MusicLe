@@ -15,7 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"MusicLeCLI/bridge/download"
+	"MusicLe/bridge/download"
 )
 
 var (

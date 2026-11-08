@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	"MusicLeCLI/internal/td/logging"
-	"MusicLeCLI/internal/td/model"
+	"MusicLe/internal/td/logging"
+	"MusicLe/internal/td/model"
 	"github.com/kkdai/youtube/v2"
 )
 

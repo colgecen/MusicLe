@@ -1,4 +1,4 @@
-module MusicLeCLI
+module MusicLe
 
 go 1.26.1
 

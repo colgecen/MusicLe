@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"MusicLeCLI/internal/td/model"
+	"MusicLe/internal/td/model"
 )
 
 func TestExtFromContainer(t *testing.T) {

@@ -8,11 +8,11 @@ import (
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"MusicLeCLI/bridge"
-	"MusicLeCLI/components"
-	"MusicLeCLI/internal/browser"
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/bridge"
+	"MusicLe/components"
+	"MusicLe/internal/browser"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 type StartDownloadMsg struct {
@@ -132,7 +132,7 @@ func NewMainModel() *MainModel {
 func (m *MainModel) Init() tea.Cmd {
 	return tea.Batch(
 		tea.HideCursor,
-		tea.SetWindowTitle("MusicLeCLI"),
+		tea.SetWindowTitle("MusicLe"),
 		m.home.Init(),
 		m.settings.Init(),
 		m.downloads.Init(),

@@ -4,11 +4,10 @@
 *.dll
 *.so
 *.dylib
-musicle
-musicle.exe
-musicle-cli
-MusicLeCLI
-MusicleCLI*
+music-le
+music-le.exe
+MusicLe
+MusicLe.exe
 
 # Test binary, built with `go test -c`
 *.test
@@ -60,7 +59,7 @@ dist/
 
 # AppImage build artifacts
 *.AppImage
-musicle-cli*.AppDir/
+*.AppDir/
 appimagetool
 
 # Build output

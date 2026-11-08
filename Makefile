@@ -1,4 +1,4 @@
-# Makefile — reproducible build, vet and test for musicle-cli
+# Makefile — reproducible build, vet and test for musicle
 #
 # The full binary needs CGO + ALSA dev headers (the oto audio backend). On a
 # machine without those, `make build` fails only on the player package; the
@@ -18,8 +18,8 @@ all: build
 # nothing to prepare: one plain `go build` yields a fully self-contained
 # binary. The binary is stripped (-s -w) and UPX-packed when upx is present.
 build:
-	CGO_ENABLED=1 $(GO) build $(LDFLAGS) -o build/musicle-cli .
-	-upx --best --lzma build/musicle-cli 2>/dev/null || true
+	CGO_ENABLED=1 $(GO) build $(LDFLAGS) -o build/music-le .
+	upx --best --lzma build/music-le 2>/dev/null || true
 
 # Vet the packages that do not depend on the audio player (buildable anywhere).
 vet:

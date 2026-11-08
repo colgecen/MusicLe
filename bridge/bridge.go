@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"MusicLeCLI/state"
+	"MusicLe/state"
 )
 
 // Action is sent to the audio or playlist engine

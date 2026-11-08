@@ -5,7 +5,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	"MusicLeCLI/ui"
+	"MusicLe/ui"
 )
 
 func TestVolumeColor(t *testing.T) {

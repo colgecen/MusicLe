@@ -10,9 +10,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"MusicLeCLI/internal/audio"
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/internal/audio"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 var themeNames = func() []string {

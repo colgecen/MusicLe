@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"MusicLeCLI/bridge/download/music"
+	"MusicLe/bridge/download/music"
 )
 
 // httpClient bounds playlist page fetches (no hanging workers).

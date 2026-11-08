@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"MusicLeCLI/bridge/download"
+	"MusicLe/bridge/download"
 )
 
 // Scraped Spotify metadata — no API, no credentials.

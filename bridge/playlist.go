@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"MusicLeCLI/internal/browser"
-	"MusicLeCLI/state"
+	"MusicLe/internal/browser"
+	"MusicLe/state"
 )
 
 const mp3Ext = ".mp3"

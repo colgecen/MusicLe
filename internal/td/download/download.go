@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"MusicLeCLI/internal/td/logging"
-	"MusicLeCLI/internal/td/model"
-	"MusicLeCLI/internal/td/spotify"
-	"MusicLeCLI/internal/td/util"
-	"MusicLeCLI/internal/td/youtube"
+	"MusicLe/internal/td/logging"
+	"MusicLe/internal/td/model"
+	"MusicLe/internal/td/spotify"
+	"MusicLe/internal/td/util"
+	"MusicLe/internal/td/youtube"
 )
 
 // extFromContainer maps a media container to the file extension used on disk.

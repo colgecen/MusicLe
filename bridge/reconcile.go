@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"MusicLeCLI/state"
+	"MusicLe/state"
 )
 
 // ReconcileLibrary scans every playlist directory and registers orphan audio

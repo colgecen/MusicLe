@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"MusicLeCLI/bridge/download/music"
-	"MusicLeCLI/bridge/download/playlist"
-	"MusicLeCLI/internal/engine"
-	"MusicLeCLI/state"
+	"MusicLe/bridge/download/music"
+	"MusicLe/bridge/download/playlist"
+	"MusicLe/internal/engine"
+	"MusicLe/state"
 )
 
 // engineDisabled reports whether the user opted out of the pure-Go engine

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MusicLeCLI/state"
+	"MusicLe/state"
 )
 
 func makeTempState(t *testing.T) (string, func()) {

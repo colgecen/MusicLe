@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MusicLeCLI/state"
+	"MusicLe/state"
 )
 
 // TestRegisterSongWritesSongList guards the "downloads but not in playlist"

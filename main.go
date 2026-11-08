@@ -7,21 +7,21 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"MusicLeCLI/bridge"
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/bridge"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 var version = "dev"
 var commit = ""
 var date = ""
 
-const bannerText = `MusicLeCLI — terminal music player
+const bannerText = `MusicLe — terminal music player
 Pure-Go download engine: no external tools (MP3 + album art)
 `
 
-const helpText = `MusicLeCLI — terminal music player with download engine
-Usage:  MusicLeCLI.exe [--version] [--help]
+const helpText = `MusicLe — terminal music player with download engine
+Usage:  music-le [--version] [--help]
 
 Keys:
   F2          Cycle tabs (Home / Downloads / Profile / Playlist / Settings)
@@ -57,7 +57,7 @@ func main() {
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "--version":
-			fmt.Println("musicle", versionString())
+			fmt.Println("music-le", versionString())
 			return
 		case "--help", "-h":
 			cfgDir, _ := os.UserConfigDir()

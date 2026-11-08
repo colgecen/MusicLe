@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"sync"
 
-	"MusicLeCLI/bridge/download"
-	"MusicLeCLI/bridge/download/music"
+	"MusicLe/bridge/download"
+	"MusicLe/bridge/download/music"
 )
 
 // SpotifyPlaylistEntry is a single track from a Spotify playlist with stored audio bytes.

@@ -18,10 +18,10 @@ import (
 	"github.com/dhowden/tag"
 	_ "golang.org/x/image/webp"
 
-	"MusicLeCLI/bridge"
-	"MusicLeCLI/internal/browser"
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/bridge"
+	"MusicLe/internal/browser"
+	"MusicLe/state"
+	"MusicLe/ui"
 
 	_ "image/jpeg"
 	_ "image/png"

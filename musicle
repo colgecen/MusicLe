@@ -1,0 +1,427 @@
+#!/usr/bin/env bash
+#
+# musicle — MusicLe interaktif derleme aracı
+#
+# Kullanim:
+#   ./musicle                    -> interaktif menü (OS sec -> format sec -> derle)
+#   ./musicle --list             -> tüm derleme seceneklerini listele
+#   ./musicle linux appimage     -> direkt derle (argümanli, menüsüz)
+#   ./musicle windows exe-zip
+#   ./musicle macos targz
+#   ./musicle --install          -> ~/.local/bin'e sembolik bag kur,
+#                                    sonra her klasörden `musicle` yazman yeterli
+#   ./musicle --help             -> yardim
+#
+# Gecerli hedefler:
+#   linux   : appimage | rpm | targz | binary
+#   windows : exe | exe-zip
+#   macos   : targz | binary
+#
+set -euo pipefail
+
+VERSION="${VERSION:-1.6.0}"
+# ROOT = bu scriptin bulundugu repo koku. $0 symlink (örn. ~/.local/bin)
+# uzerinden cagrilabilir, o yuzden tum symlink'ler cozuler.
+resolve_root() {
+  local src="${BASH_SOURCE[0]}"
+  while [ -L "$src" ]; do
+    local dir
+    dir="$(cd -P "$(dirname "$src")" && pwd)"
+    src="$(readlink "$src")"
+    [[ "$src" != /* ]] && src="$dir/$src"
+  done
+  cd -P "$(dirname "$src")" && pwd
+}
+ROOT="$(resolve_root)"
+
+GO=$(command -v go 2>/dev/null || command -v /usr/local/go/bin/go 2>/dev/null || command -v /usr/lib/go/bin/go 2>/dev/null || true)
+if [ -z "$GO" ]; then
+  echo "Go bulunamadi. Kur: sudo dnf install golang"
+  exit 1
+fi
+
+banner() {
+  echo "=============================================="
+  echo "  MusicLe — musicle derleme araci  v$VERSION"
+  echo "=============================================="
+}
+
+usage() {
+  banner
+  echo
+  echo "Kullanim:"
+  echo "  ./musicle                     Interaktif menü"
+  echo "  ./musicle <os> <format>       Direkt derle"
+  echo "  ./musicle --list              Secenekleri listele"
+  echo "  ./musicle --install           Komutu sisteme kur (her yerden 'musicle')"
+  echo "  ./musicle --help              Bu yardim"
+  echo
+  echo "Hedefler:"
+  echo "  linux   : appimage | rpm | targz | binary"
+  echo "  windows : exe | exe-zip"
+  echo "  macos   : targz | binary"
+  echo
+  echo "Ornekler:"
+  echo "  ./musicle linux appimage"
+  echo "  ./musicle windows exe-zip"
+  echo "  VERSION=1.5.0 ./musicle linux targz"
+}
+
+list_targets() {
+  echo "linux   : appimage (.AppImage) | rpm (.rpm) | targz (.tar.gz) | binary (binary only)"
+  echo "windows : exe (.exe) | exe-zip (.exe + .zip)"
+  echo "macos   : targz (.tar.gz) | binary (binary only)"
+}
+
+do_install() {
+  local bindir="$HOME/.local/bin"
+  mkdir -p "$bindir"
+  ln -sf "$ROOT/musicle" "$bindir/musicle"
+  echo "Kuruldu: $bindir/musicle -> $ROOT/musicle"
+  case ":$PATH:" in
+    *":$bindir:"*) echo "PATH zaten '$bindir' iceriyor. Artik her klasorden 'musicle' yazabilirsin." ;;
+    *)
+      echo "NOT: '$bindir' PATH'te yok. Su satiri ~/.bashrc'ye ekle:"
+      echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+      echo "Sonra yeni terminal ac ya da: source ~/.bashrc"
+      ;;
+  esac
+}
+
+# fetch_appimagetool: appimagetool ikilisini bulur ya da indirir.
+# PATH'te varsa onu kullanir; yoksa build/ altina curl, sonra wget ile indirir.
+fetch_appimagetool() {
+  local dest="$ROOT/build/appimagetool"
+  local url="https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+
+  if command -v appimagetool >/dev/null 2>&1; then
+    APPIMAGETOOL="$(command -v appimagetool)"
+    return 0
+  fi
+  if [ -s "$dest" ]; then
+    APPIMAGETOOL="$dest"
+    chmod +x "$APPIMAGETOOL"
+    return 0
+  fi
+
+  rm -f "$dest"
+  echo "==> appimagetool indiriliyor..."
+  if command -v curl >/dev/null 2>&1; then
+    curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 120 "$url" -o "$dest" || rm -f "$dest"
+  fi
+  if [ ! -s "$dest" ] && command -v wget >/dev/null 2>&1; then
+    wget -O "$dest" "$url" || rm -f "$dest"
+  fi
+  if [ ! -s "$dest" ]; then
+    echo "HATA: appimagetool indirilemedi. Internet baglantisini kontrol et"
+    echo "      ya da appimagetool'u PATH'e kurup tekrar dene."
+    exit 1
+  fi
+  chmod +x "$dest"
+  APPIMAGETOOL="$dest"
+}
+
+# fetch_appimage_runtime: type2 runtime'i onbelleğe indirir. appimagetool
+# bunu kendi indirmeye calisirken zaman zaman 503 aliyor; biz onceden
+# indirip --runtime-file ile veriyoruz.
+fetch_appimage_runtime() {
+  local dest="$ROOT/build/runtime-x86_64"
+  local url="https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64"
+  APPIMAGE_RUNTIME=""
+
+  if [ -s "$dest" ]; then
+    APPIMAGE_RUNTIME="$dest"
+    return 0
+  fi
+
+  echo "==> AppImage runtime indiriliyor..."
+  rm -f "$dest"
+  if command -v curl >/dev/null 2>&1; then
+    curl -fL --retry 3 --retry-delay 2 --connect-timeout 15 --max-time 120 "$url" -o "$dest" || rm -f "$dest"
+  fi
+  if [ ! -s "$dest" ] && command -v wget >/dev/null 2>&1; then
+    wget -O "$dest" "$url" || rm -f "$dest"
+  fi
+  if [ ! -s "$dest" ]; then
+    echo "UYARI: AppImage runtime indirilemedi; appimagetool kendi deneyecek."
+    rm -f "$dest"
+    return 1
+  fi
+  chmod +x "$dest"
+  APPIMAGE_RUNTIME="$dest"
+}
+
+build_linux() {
+  local fmt="$1"
+  mkdir -p "$ROOT/build"
+  echo "==> Binary derleniyor (linux)..."
+  # shellcheck disable=SC2086
+  CGO_ENABLED=1 $GO build -ldflags="-s -w -X main.version=$VERSION" -o "$ROOT/build/music-le" "$ROOT"
+  upx --best --lzma "$ROOT/build/music-le" 2>/dev/null || true
+
+  case "$fmt" in
+    appimage)
+      echo "==> AppImage paketleniyor..."
+      APPDIR="$ROOT/build/MusicLe.AppDir"
+      mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/lib" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/icons/hicolor/1024x1024/apps"
+
+      # NOT: Sistem kutuphaneleri (orn. libasound) BILEREK paketlenmiyor.
+      # Derleme makinesindeki kopya daha yeni bir glibc istiyor (burada
+      # GLIBC_2.43) ve eski dagitimlarda "version GLIBC_2.43 not found"
+      # hatasiyla uygulamayi acilmaz hale getiriyor. libasound zaten ses
+      # calan her Linux dagitiminda kurulu; sisteminkini kullaniyoruz.
+      cp "$ROOT/build/music-le" "$APPDIR/usr/bin/"
+      cp "$ROOT/assets/MusicLe.png" "$APPDIR/musicle.png"
+      # Ayni ikonu 3 kez kopyalamak yerine sembolik link kullaniyoruz.
+      ln -sf musicle.png "$APPDIR/.DirIcon"
+      ln -sf musicle.png "$APPDIR/usr/share/icons/hicolor/1024x1024/apps/musicle.png"
+
+      cat > "$APPDIR/AppRun" << 'APPRUN'
+#!/bin/sh
+HERE="$(dirname "$(readlink -f "$0")")"
+export APPDIR="$HERE"
+# Args verilince (--version, --help ...) veya gercek bir terminal varsa
+# dogrudan calistir; sadece masaustunden tiklaninca terminal ac.
+if [ $# -gt 0 ] || [ -t 0 ]; then
+  exec "$HERE/usr/bin/music-le" "$@"
+else
+  for term in x-terminal-emulator gnome-terminal konsole xterm alacritty kitty; do
+    if command -v "$term" >/dev/null 2>&1; then
+      exec "$term" -e "$HERE/usr/bin/music-le" "$@"
+    fi
+  done
+  exec "$HERE/usr/bin/music-le" "$@"
+fi
+APPRUN
+      chmod +x "$APPDIR/AppRun"
+
+      cat > "$APPDIR/musicle.desktop" << 'DESKTOP'
+[Desktop Entry]
+Name=MusicLe
+Exec=music-le
+Icon=musicle
+Terminal=true
+Type=Application
+Categories=AudioVideo;Audio;Music;Player;
+StartupNotify=false
+DESKTOP
+      cp "$APPDIR/musicle.desktop" "$APPDIR/usr/share/applications/"
+      fetch_appimagetool
+      cd "$ROOT/build"
+      "$APPIMAGETOOL" --appimage-extract > /dev/null 2>&1 || true
+      TMP_APPIMAGE="MusicLe.build.AppImage"
+      rm -f "$TMP_APPIMAGE"
+      fetch_appimage_runtime || true
+      if [ -n "${APPIMAGE_RUNTIME:-}" ]; then
+        ./squashfs-root/AppRun --runtime-file "$APPIMAGE_RUNTIME" -n MusicLe.AppDir "$TMP_APPIMAGE"
+      else
+        ./squashfs-root/AppRun -n MusicLe.AppDir "$TMP_APPIMAGE"
+      fi
+      mv -f "$TMP_APPIMAGE" MusicLe.AppImage
+      rm -rf squashfs-root MusicLe.AppDir
+      cd "$ROOT"
+      echo "==> build/MusicLe.AppImage"
+      ;;
+    rpm)
+      echo "==> RPM paketleniyor..."
+      mkdir -p "$ROOT/build/rpm/{BUILD,RPMS,SOURCES,SPECS,SRPMS}"
+      cat > "$ROOT/build/rpm/SPECS/musicle.spec" << SPEC
+Name: musicle
+Version: $VERSION
+Release: 1
+Summary: Terminal music player
+License: MIT
+BuildArch: x86_64
+%description
+MusicLe - terminal music player
+%install
+mkdir -p %{buildroot}/usr/local/bin
+cp %{_sourcedir}/music-le %{buildroot}/usr/local/bin/
+%files
+/usr/local/bin/music-le
+SPEC
+      cp "$ROOT/build/music-le" "$ROOT/build/rpm/SOURCES/"
+      rpmbuild --define "_topdir $ROOT/build/rpm" -bb "$ROOT/build/rpm/SPECS/musicle.spec"
+      cp "$ROOT/build/rpm/RPMS/x86_64/"*.rpm "$ROOT/build/"
+      echo "==> build/*.rpm"
+      ;;
+    targz)
+      echo "==> tar.gz paketleniyor..."
+      mkdir -p "$ROOT/build/musicle_Linux_x86_64"
+      cp "$ROOT/build/music-le" "$ROOT/build/musicle_Linux_x86_64/music-le"
+      cp "$ROOT/README.md" "$ROOT/build/musicle_Linux_x86_64/" 2>/dev/null || true
+      cd "$ROOT/build" && tar czf musicle_Linux_x86_64.tar.gz musicle_Linux_x86_64 && cd "$ROOT"
+      echo "==> build/musicle_Linux_x86_64.tar.gz"
+      ;;
+    binary)
+      echo "==> build/music-le"
+      ;;
+    *)
+      echo "Bilinmeyen linux formati: $fmt (gecerli: appimage | rpm | targz | binary)"
+      exit 1
+      ;;
+  esac
+}
+
+build_windows() {
+  local fmt="$1"
+  mkdir -p "$ROOT/build"
+  echo "==> Derleniyor (windows)..."
+  GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $GO build -ldflags="-s -w -X main.version=$VERSION" -o "$ROOT/build/music-le.exe" "$ROOT"
+  upx --best --lzma "$ROOT/build/music-le.exe" 2>/dev/null || true
+  case "$fmt" in
+    exe)
+      echo "==> build/music-le.exe"
+      ;;
+    exe-zip|zip)
+      mkdir -p "$ROOT/build/musicle_Windows_x86_64"
+      cp "$ROOT/build/music-le.exe" "$ROOT/build/musicle_Windows_x86_64/music-le.exe"
+      rm -f "$ROOT/build/musicle_Windows_x86_64.zip"
+      cd "$ROOT/build" && zip -r musicle_Windows_x86_64.zip musicle_Windows_x86_64 && cd "$ROOT"
+      echo "==> build/musicle_Windows_x86_64.zip"
+      ;;
+    *)
+      echo "Bilinmeyen windows formati: $fmt (gecerli: exe | exe-zip)"
+      exit 1
+      ;;
+  esac
+}
+
+build_macos() {
+  local fmt="$1"
+  mkdir -p "$ROOT/build"
+  echo "==> Derleniyor (macos)..."
+  GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 $GO build -ldflags="-s -w -X main.version=$VERSION" -o "$ROOT/build/music-le-darwin" "$ROOT"
+  upx --best --lzma "$ROOT/build/music-le-darwin" 2>/dev/null || true
+  case "$fmt" in
+    targz|tar.gz)
+      mkdir -p "$ROOT/build/musicle_macOS_x86_64"
+      cp "$ROOT/build/music-le-darwin" "$ROOT/build/musicle_macOS_x86_64/music-le"
+      cp "$ROOT/README.md" "$ROOT/build/musicle_macOS_x86_64/" 2>/dev/null || true
+      cd "$ROOT/build" && tar czf musicle_macOS_x86_64.tar.gz musicle_macOS_x86_64 && cd "$ROOT"
+      echo "==> build/musicle_macOS_x86_64.tar.gz"
+      ;;
+    binary)
+      echo "==> build/music-le-darwin"
+      ;;
+    *)
+      echo "Bilinmeyen macos formati: $fmt (gecerli: targz | binary)"
+      exit 1
+      ;;
+  esac
+}
+
+build_target() {
+  local os="$1" fmt="$2"
+  banner
+  echo "Hedef: OS=$os  Format=$fmt  Version=$VERSION"
+  echo
+  case "$os" in
+    linux)   build_linux "$fmt" ;;
+    windows) build_windows "$fmt" ;;
+    macos|darwin) build_macos "$fmt" ;;
+    *)
+      echo "Bilinmeyen OS: $os (gecerli: linux | windows | macos)"
+      exit 1
+      ;;
+  esac
+  echo
+  echo "Bitti."
+}
+
+interactive() {
+  banner
+  echo
+  echo "Hedef isletim sistemi sec:"
+  select os_choice in "Linux" "Windows" "macOS" "Vazgec"; do
+    case "$os_choice" in
+      Linux)   OS="linux"; break ;;
+      Windows) OS="windows"; break ;;
+      macOS)   OS="macos"; break ;;
+      Vazgec|"") echo "Vazgecildi."; exit 0 ;;
+      *) echo "Gecersiz secim, tekrar dene." ;;
+    esac
+  done
+
+  echo
+  case "$OS" in
+    linux)
+      echo "Paket formati sec:"
+      select f in "AppImage (.AppImage)" "RPM (.rpm)" "tar.gz (.tar.gz)" "Binary only" "Vazgec"; do
+        case "$REPLY" in
+          1) FMT="appimage"; break ;;
+          2) FMT="rpm"; break ;;
+          3) FMT="targz"; break ;;
+          4) FMT="binary"; break ;;
+          5|"") echo "Vazgecildi."; exit 0 ;;
+          *) echo "Gecersiz secim, tekrar dene." ;;
+        esac
+      done
+      ;;
+    windows)
+      echo "Paket formati sec:"
+      select f in ".exe (portable)" ".exe + .zip" "Vazgec"; do
+        case "$REPLY" in
+          1) FMT="exe"; break ;;
+          2) FMT="exe-zip"; break ;;
+          3|"") echo "Vazgecildi."; exit 0 ;;
+          *) echo "Gecersiz secim, tekrar dene." ;;
+        esac
+      done
+      ;;
+    macos)
+      echo "Paket formati sec:"
+      select f in "tar.gz (.tar.gz)" "Binary only" "Vazgec"; do
+        case "$REPLY" in
+          1) FMT="targz"; break ;;
+          2) FMT="binary"; break ;;
+          3|"") echo "Vazgecildi."; exit 0 ;;
+          *) echo "Gecersiz secim, tekrar dene." ;;
+        esac
+      done
+      ;;
+  esac
+
+  build_target "$OS" "$FMT"
+}
+
+# ---- argüman yönlendirme ----
+if [ $# -eq 0 ]; then
+  interactive
+  exit 0
+fi
+
+case "${1:-}" in
+  -h|--help|help)
+    usage
+    ;;
+  -l|--list|list)
+    list_targets
+    ;;
+  --install|install)
+    do_install
+    ;;
+  --version|-v)
+    echo "musicle $VERSION"
+    ;;
+  linux|windows|macos|darwin)
+    if [ $# -lt 2 ]; then
+      echo "Format eksik. Ornek: ./musicle $1 <format>"
+      list_targets
+      exit 1
+    fi
+    OS="$1"; FMT="$2"
+    # 3. argüman olarak version verilebilir: ./musicle linux appimage 1.5.0
+    if [ $# -ge 3 ]; then
+      VERSION="$3"
+    fi
+    build_target "$OS" "$FMT"
+    ;;
+  *)
+    # VERSION=... ./musicle 1.5.0  seklinde sürümle çağrı ya da hatalı kullanım
+    echo "Bilinmeyen komut: $1"
+    echo
+    usage
+    exit 1
+    ;;
+esac

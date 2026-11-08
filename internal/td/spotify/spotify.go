@@ -10,7 +10,7 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
 
-	"MusicLeCLI/internal/td/model"
+	"MusicLe/internal/td/model"
 )
 
 // FullTrack is a Spotify track (alias of the upstream type).

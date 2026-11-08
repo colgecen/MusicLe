@@ -1,8 +1,8 @@
 package components
 
 import (
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 // navLabels holds every header tab label in all 11 languages, without

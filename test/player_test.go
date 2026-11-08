@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"MusicLeCLI/bridge"
+	"MusicLe/bridge"
 )
 
 func TestPlayerCall_PlayNoFile(t *testing.T) {

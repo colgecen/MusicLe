@@ -9,10 +9,10 @@ import (
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"MusicLeCLI/bridge"
-	"MusicLeCLI/internal/browser"
-	"MusicLeCLI/state"
-	"MusicLeCLI/ui"
+	"MusicLe/bridge"
+	"MusicLe/internal/browser"
+	"MusicLe/state"
+	"MusicLe/ui"
 )
 
 // ConnectModel is the platform-selection screen of the browser connector.

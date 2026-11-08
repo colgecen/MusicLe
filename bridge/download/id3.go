@@ -76,7 +76,7 @@ func WriteID3Tag(mp3Data []byte, info *TrackInfo) ([]byte, error) {
 	if info.Thumbnail != "" {
 		txxxFrames = append(txxxFrames, writeTXXXFrame("Thumbnail", info.Thumbnail))
 	}
-	txxxFrames = append(txxxFrames, writeTXXXFrame("Encoding", "MusicLeCLI pure Go encoder"))
+	txxxFrames = append(txxxFrames, writeTXXXFrame("Encoding", "MusicLe pure Go encoder"))
 	frames = append(frames, txxxFrames...)
 
 	if info.DurationSec > 0 {
